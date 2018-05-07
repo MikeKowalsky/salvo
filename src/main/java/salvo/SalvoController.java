@@ -1,13 +1,11 @@
 package salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,32 +19,35 @@ public class SalvoController {
     @Autowired
     GameRepository gameRepo;
 
-    private Map<String, Object> makePlayerDTO(Player player){
+    @Autowired
+    GamePlayerRepository gamePlayerRepo;
+
+    private Map<String, Object> MakePlayerDTO(Player player){
         Map<String, Object> playerDTO = new LinkedHashMap<String, Object>();
         playerDTO.put("id", player.getId());
         playerDTO.put("email", player.getUserName());
         return playerDTO;
     }
 
-    private Map<String, Object> makeGamePlayerDTO(GamePlayer gamePlayer){
+    private Map<String, Object> MakeGamePlayerDTO(GamePlayer gamePlayer){
         Map<String, Object> gamePlayerDTO = new LinkedHashMap<String, Object>();
         gamePlayerDTO.put("id", gamePlayer.getId());
-        gamePlayerDTO.put("player", makePlayerDTO(gamePlayer.getPlayer()));
+        gamePlayerDTO.put("player", MakePlayerDTO(gamePlayer.getPlayer()));
         return gamePlayerDTO;
     }
 
-    private Set<Object> makeGamePlayerSetDTO(Set<GamePlayer> gamePlayerSet){
+    private Set<Object> MakeGamePlayerSetDTO(Set<GamePlayer> gamePlayerSet){
         return gamePlayerSet
                 .stream()
-                .map(oneGamePlayer -> makeGamePlayerDTO(oneGamePlayer))
+                .map(oneGamePlayer -> MakeGamePlayerDTO(oneGamePlayer))
                 .collect(Collectors.toSet());
     }
 
-    private Map<String, Object> makeGameDTO(Game game) {
+    private Map<String, Object> MakeGameDTO(Game game) {
         Map<String, Object> gameDTO = new LinkedHashMap<String, Object>();
         gameDTO.put("id", game.getId());
         gameDTO.put("created", game.getCreationDate());
-        gameDTO.put("gamePlayers", makeGamePlayerSetDTO(game.getGamePlayerSet()));
+        gameDTO.put("gamePlayers", MakeGamePlayerSetDTO(game.getGamePlayerSet()));
         return gameDTO;
     }
 
@@ -56,7 +57,47 @@ public class SalvoController {
         return gameRepo
                 .findAll()
                 .stream()
-                .map(oneGame -> makeGameDTO(oneGame))
+                .map(oneGame -> MakeGameDTO(oneGame))
                 .collect(Collectors.toList());
     }
+
+
+    private Map<String, Object> MakeShipDTO (Ship ship){
+        Map<String, Object> shipDTO = new LinkedHashMap<String, Object>();
+        shipDTO.put("type", ship.getShipType());
+        shipDTO.put("locations", ship.getLocations());
+        return shipDTO;
+    }
+
+
+    private Set<Object> MakeShipSetDTO (Set<Ship> ships){
+        return ships
+                .stream()
+                .map(ship -> MakeShipDTO(ship))
+                .collect(Collectors.toSet());
+    }
+
+    @RequestMapping("/game_view/{playerId}")
+    public Map<String, Object> singleGameView (@PathVariable Long playerId){
+
+        Optional<GamePlayer> gp =
+                gamePlayerRepo
+                    .findAll()
+                    .stream()
+                    .filter(oneGamePlayer -> oneGamePlayer.getPlayer().getId() == playerId)
+                    .findFirst();
+
+//        GamePlayer gp = gamePlayerRepo.findOne(playerId);
+
+        Map<String, Object> gameWithUserMap = new LinkedHashMap<String, Object>();
+        gameWithUserMap.put("id", gp.get().getGame().getId());
+//        gameWithUserMap.put("created", gp.get().getEnterDate());
+        gameWithUserMap.put("created", gp.get().getGame().getCreationDate());
+        gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.get().getGame().getGamePlayerSet()));
+//        gameWithUserMap.put("gamePlayers", MakeGamePlayerDTO(gp.get()));
+        gameWithUserMap.put("ships", MakeShipSetDTO(gp.get().getShips()));
+
+        return gameWithUserMap;
+    }
+
 }
