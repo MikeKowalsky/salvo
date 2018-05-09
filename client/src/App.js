@@ -1,62 +1,52 @@
 import React, { Component } from 'react';
+import {BrowserRouter as Router, Route, Link, Switch} from "react-router-dom";
+
+import Home from './Home';
+import Games from './Games';
+
 import logo from './logo.png';
 import './App.css';
 
 class App extends Component<> {
 
-  constructor() {
-    super();
+  // constructor() {
+  //     super();
+  // }
 
-    this.state = {
-      games: [],
-      isLoading: false
-    };
-  }
-
-  componentDidMount() {
-  this.setState({isLoading: true});
-
-  fetch('http://localhost:8080/api/games')
-      .then(response => response.json())
-      .then(data => {
-          console.log(data);
-          this.setState({games: data, isLoading: false});
-      });
-  }
 
   render() {
-    const {games, isLoading} = this.state;
 
-    if (isLoading) {
-      return <p>Loading...</p>;
-    }
+      return (
+          <div className="App">
+              <header className="App-header">
+                  <img src={logo} className="App-logo" alt="logo" />
+                  <h1 className="App-title">Welcome to Salvo!</h1>
+              </header>
+              <div>
 
-      let copyState = [...this.state.games];
+              </div>
 
-      copyState.map((game) => {
-          game.created = new Date(game.created).toString();
-      });
+              <Router>
+                  <div>
+                      <ul>
+                          <li>
+                              <Link to="/">Home</Link>
+                          </li>
+                          <li>
+                              <Link to="/games">Games</Link>
+                          </li>
+                      </ul>
 
-
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to Salvo!</h1>
-        </header>
-        <div>
-          <h2>Game List</h2>
-          {copyState.map((game) =>
-              <div key={game.id}>
-                  Game ID: {game.id}
-                  Created: {game.created}
-                  Player One: {game.gamePlayers[0].player.email}
-                  Player Two: {(game.gamePlayers.length > 1) ? game.gamePlayers[1].player.email : "N/A"}
+                      <Switch>
+                            <Route exact path="/" component={Home} />
+                            <Route path="/games" component={Games} />
+                      </Switch>
                   </div>
-          )}
-        </div>
-      </div>
-    );
+              </Router>
+
+          </div>
+
+      );
   }
 
 }

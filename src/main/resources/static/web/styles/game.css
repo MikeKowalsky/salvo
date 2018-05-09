@@ -1,0 +1,31 @@
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#grid {
+    width: 462px;
+    padding: 0px;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+#grid > tr > td {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.playersShip {
+    background-color: red;
+}
+
+.bold {
+    font-weight: bold;
+}

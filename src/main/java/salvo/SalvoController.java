@@ -77,25 +77,16 @@ public class SalvoController {
                 .collect(Collectors.toSet());
     }
 
-    @RequestMapping("/game_view/{playerId}")
-    public Map<String, Object> singleGameView (@PathVariable Long playerId){
+    @RequestMapping("/game_view/{gamePlayerId}")
+    public Map<String, Object> singleGameView (@PathVariable Long gamePlayerId){
 
-        Optional<GamePlayer> gp =
-                gamePlayerRepo
-                    .findAll()
-                    .stream()
-                    .filter(oneGamePlayer -> oneGamePlayer.getPlayer().getId() == playerId)
-                    .findFirst();
-
-//        GamePlayer gp = gamePlayerRepo.findOne(playerId);
+        GamePlayer gp = gamePlayerRepo.findOne(gamePlayerId);
 
         Map<String, Object> gameWithUserMap = new LinkedHashMap<String, Object>();
-        gameWithUserMap.put("id", gp.get().getGame().getId());
-//        gameWithUserMap.put("created", gp.get().getEnterDate());
-        gameWithUserMap.put("created", gp.get().getGame().getCreationDate());
-        gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.get().getGame().getGamePlayerSet()));
-//        gameWithUserMap.put("gamePlayers", MakeGamePlayerDTO(gp.get()));
-        gameWithUserMap.put("ships", MakeShipSetDTO(gp.get().getShips()));
+        gameWithUserMap.put("gameId", gp.getGame().getId());
+        gameWithUserMap.put("created", gp.getGame().getCreationDate());
+        gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.getGame().getGamePlayerSet()));
+        gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
 
         return gameWithUserMap;
     }
