@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './Games.css';
 
 class Games extends Component<> {
 
@@ -7,12 +8,11 @@ class Games extends Component<> {
 
         this.state = {
             games: [],
-            isLoading: false
+            isLoading: true
         };
     }
 
     componentDidMount() {
-        this.setState({isLoading: true});
 
         fetch('http://localhost:8080/api/games')
             .then(response => response.json())
@@ -29,22 +29,18 @@ class Games extends Component<> {
             return <p>Loading...</p>;
         }
 
-        console.log(games);
-
-        let copyState = [...this.state.games];
-
-        copyState.map((game) => game.created = new Date(game.created).toString());
+        console.log(this.state.games);
 
         return (
             <div>
-                <div>
+                <div className={'gameList'}>
                     <h2>Game List</h2>
-                    {copyState.map((game) =>
-                        <div key={game.id}>
-                            Game ID: {game.id}
-                            Created: {game.created}
-                            Player One: {game.gamePlayers[0].player.email}
-                            Player Two: {(game.gamePlayers.length > 1) ? game.gamePlayers[1].player.email : "N/A"}
+                    {games.map((game) =>
+                        <div className={'gameListElement'} key={game.id}>
+                            Game ID: {game.id}&nbsp;
+                            Created: {new Date(game.created).toString()}&nbsp;
+                            Player One: {game.gamePlayers[0].player.email}&nbsp;
+                            Player Two: {(game.gamePlayers.length > 1) ? game.gamePlayers[1].player.email : "N/A"}&nbsp;
                         </div>
                     )}
                 </div>

@@ -1,0 +1,12 @@
+.Grid {
+    border-spacing: 0;
+}
+
+
+.Grid > tr > td {
+
+    height: 40px;
+    width: 40px;
+
+    border: 1px solid black;
+}
