@@ -77,6 +77,25 @@ public class SalvoController {
                 .collect(Collectors.toSet());
     }
 
+    private Map<Long, Object> MakeSalvoTurnsDTO(Salvo salvo){
+        Map<Long, Object> salvoTurnsDTO = new LinkedHashMap<Long, Object>();
+        salvoTurnsDTO.put(salvo.getTurnNumber(), salvo.getLocations());
+        return salvoTurnsDTO;
+    }
+
+    private Map<Long, Object> MakeSalvoDTO(Salvo salvo){
+        Map<Long, Object> salvoDTO = new LinkedHashMap<Long, Object>();
+        salvoDTO.put(salvo.getGamePlayer().getPlayer().getId(), MakeSalvoTurnsDTO(salvo));
+        return salvoDTO;
+    }
+
+    private Set<Object> MakeSalvoSetDTO (Set<Salvo> salvos){
+        return salvos
+                .stream()
+                .map(salvo -> MakeSalvoDTO(salvo))
+                .collect(Collectors.toSet());
+    }
+
     @RequestMapping("/game_view/{gamePlayerId}")
     public Map<String, Object> singleGameView (@PathVariable Long gamePlayerId){
 
@@ -87,6 +106,7 @@ public class SalvoController {
         gameWithUserMap.put("created", gp.getGame().getCreationDate());
         gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.getGame().getGamePlayerSet()));
         gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
+        gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos()));
 
         return gameWithUserMap;
     }

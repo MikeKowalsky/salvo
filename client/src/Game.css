@@ -5,3 +5,20 @@
 
     padding: 20px;
 }
+
+.playersShip {
+    background-color: red;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+
+.gameChosen {
+    padding-top: 5px;
+}
+
+.gameChosen > div {
+    padding-top: 5px;
+}

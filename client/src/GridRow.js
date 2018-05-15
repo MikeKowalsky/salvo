@@ -1,9 +1,6 @@
 import React from 'react';
 
-// import './Header.css';
-
-
-function GridRow({rowName}) {
+function GridRow({rowName, rowArray}) {
 
     let columns = [];
 
@@ -13,7 +10,11 @@ function GridRow({rowName}) {
         } else if (c === 0){
             columns.push(<td key={c}>{rowName}</td>);
         } else {
-            columns.push(<td key={c}/>);
+            if(rowArray !== undefined && rowArray.includes(c.toString())){
+                columns.push(<td key={c} id={rowName + c} className={'playersShip'}/>);
+            } else {
+                columns.push(<td key={c} id={rowName + c}/>);
+            }
         }
     }
 

@@ -4,7 +4,8 @@ import {BrowserRouter as Router, Route, Link, Switch} from "react-router-dom";
 import Header from './Header';
 import Home from './Home';
 import Games from './Games';
-import Game from './Game';
+// import Game from './Game';
+import GamePlayerId from './GamePlayerId';
 
 import './App.css';
 
@@ -32,14 +33,21 @@ class App extends Component<> {
                               <Link to="/games">Games</Link>
                           </li>
                           <li>
-                              <Link to="/game">Game</Link>
+                              <Link to="/game/?gp=1">Game</Link>
                           </li>
+                          {/*<li>*/}
+                              {/*<Link to={{*/}
+                                  {/*pathname: "/game",*/}
+                                  {/*search: "?gp=:gamePlayerId"*/}
+                              {/*}}>GamePlayerID</Link>*/}
+                          {/*</li>*/}
                       </ul>
 
                       <Switch>
                           <Route exact path="/" component={Home} />
                           <Route path="/games" component={Games} />
-                          <Route path="/game" component={Game} />
+                          {/*<Route path="/game" component={Game} />*/}
+                          <Route path="/game" component={GamePlayerId} />
                       </Switch>
                   </div>
               </Router>

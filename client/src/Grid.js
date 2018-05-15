@@ -20,18 +20,37 @@ class Grid extends Component<> {
 
         let shipLocationsFromParentElement = this.props;
         console.log(shipLocationsFromParentElement);
-        console.log(typeof(shipLocationsFromParentElement));
 
-        for(let property in shipLocationsFromParentElement){
-            console.log(property);
+        let shipLocationMainArray =[];
+
+        //changing into one array and sort
+        for (const key of Object.keys(shipLocationsFromParentElement)) {
+            // console.log(key, shipLocationsFromParentElement[key].locations);
+            shipLocationsFromParentElement[key].locations.forEach(
+                (location) => shipLocationMainArray.push(location));
         }
+        shipLocationMainArray.sort();
+
+        //new object to mark (add class) to indexes during rendering
+        let shipLocationsObject = {};
+        shipLocationMainArray.forEach((location) =>
+            shipLocationsObject[location.charAt(0)] = []);
+        shipLocationMainArray.forEach((location) =>
+            shipLocationsObject[location.charAt(0)].push(location.charAt(1)));
+        console.log(shipLocationsObject);
 
         let rows = [];
         let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
+
         for (let r = 0; r < 11; r++) {
-            rows.push(<GridRow rowName={vertical[r]} key={r}/>);
+            if (shipLocationsObject.hasOwnProperty(vertical[r])){
+                rows.push(<GridRow rowName={vertical[r]} rowArray={shipLocationsObject[vertical[r]]} key={r}/>);
+            } else {
+                rows.push(<GridRow rowName={vertical[r]} key={r}/>);
+            }
         }
+
         return <tbody className={'Grid'}>{rows}</tbody>;
     }
 }
