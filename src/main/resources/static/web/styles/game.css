@@ -1,3 +1,12 @@
+
+#twoGrids {
+    display: flex;
+}
+
+#twoGrids > div {
+    padding: 5px;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -17,13 +26,54 @@ table {
 
     text-align: center;
     vertical-align: middle;
+}
 
+.gridNames{
     font-size: 20px;
     font-weight: bold;
 }
 
+#salvoGrid {
+    width: 462px;
+    padding: 0px;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+#salvoGrid > tr > td {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+}
+
+#gridOne {
+    text-align: center;
+}
+
+#gridTwo {
+    text-align: center;
+}
+
 .playersShip {
     background-color: yellow;
+}
+
+.playersSalvo {
+    background-color: blue;
+    font-weight: bold;
+}
+
+.enemysSalvo {
+    background-color: cornflowerblue;
+    font-weight: bold;
+}
+
+.enemysSalvoHit {
+    background-color: red;
+    font-weight: bold;
 }
 
 .bold {
