@@ -1,0 +1,26 @@
+
+#leaderboard{
+    border-collapse: collapse;
+}
+
+#leaderboard  > tr > th{
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    min-width: 100px;
+
+    background-color: gray;
+}
+
+#leaderboard  > tr > td{
+    border: 1px solid black;
+
+    text-align: center;
+}
+
+
+.bg {
+    background-color: lightgrey;
+}

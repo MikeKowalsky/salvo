@@ -97,9 +97,9 @@ public class SalvoController {
 
     private Map<String, Object> CountDifferentResultsDTO(Player player){
         Map<String, Object> countWinsDTO = new LinkedHashMap<String, Object>();
-        countWinsDTO.put("wins", CountCertainResults(1.0, player));
-        countWinsDTO.put("ties", CountCertainResults(0.5, player));
-        countWinsDTO.put("losses", CountCertainResults(0.0, player));
+        countWinsDTO.put("won", CountCertainResults(1.0, player));
+        countWinsDTO.put("tied", CountCertainResults(0.5, player));
+        countWinsDTO.put("lost", CountCertainResults(0.0, player));
         countWinsDTO.put("sumOfPoints", CountSum(player));
         return countWinsDTO;
     }
