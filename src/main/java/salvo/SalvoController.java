@@ -22,6 +22,9 @@ public class SalvoController {
     @Autowired
     GamePlayerRepository gamePlayerRepo;
 
+    @Autowired
+    PlayerRepository playerRepo;
+
     private Map<String, Object> MakePlayerDTO(Player player){
         Map<String, Object> playerDTO = new LinkedHashMap<String, Object>();
         playerDTO.put("id", player.getId());
@@ -43,11 +46,28 @@ public class SalvoController {
                 .collect(Collectors.toSet());
     }
 
+    private Map<String, Number> MakeScoreDTO(Score score){
+        Map<String, Number> scoreDTO = new LinkedHashMap<String, Number>();
+        scoreDTO.put("playerId", score.getPlayer().getId());
+        scoreDTO.put("score", score.getScore());
+        return scoreDTO;
+    }
+
+    private Set<Object> MakeScoreSetDTO (Set<Score> scoreSet){
+        return scoreSet
+                .stream()
+                .map(oneScore -> MakeScoreDTO(oneScore))
+                .collect(Collectors.toSet());
+    }
+
     private Map<String, Object> MakeGameDTO(Game game) {
         Map<String, Object> gameDTO = new LinkedHashMap<String, Object>();
         gameDTO.put("id", game.getId());
         gameDTO.put("created", game.getCreationDate());
         gameDTO.put("gamePlayers", MakeGamePlayerSetDTO(game.getGamePlayerSet()));
+        if (game.hasScore()){
+            gameDTO.put("scores", MakeScoreSetDTO(game.getScoreSet()));
+        }
         return gameDTO;
     }
 
@@ -58,6 +78,46 @@ public class SalvoController {
                 .findAll()
                 .stream()
                 .map(oneGame -> MakeGameDTO(oneGame))
+                .collect(Collectors.toList());
+    }
+
+    private Double CountSum (Player player){
+        return player.getScoreSet()
+                .stream()
+                .mapToDouble(oS -> oS.getScore())
+                .sum();
+    }
+
+    private Long CountCertainResults(Double result, Player player){
+        return player.getScoreSet()
+                .stream()
+                .filter(oneScore -> oneScore.getScore().equals(result))
+                .count();
+    }
+
+    private Map<String, Object> CountDifferentResultsDTO(Player player){
+        Map<String, Object> countWinsDTO = new LinkedHashMap<String, Object>();
+        countWinsDTO.put("wins", CountCertainResults(1.0, player));
+        countWinsDTO.put("ties", CountCertainResults(0.5, player));
+        countWinsDTO.put("losses", CountCertainResults(0.0, player));
+        countWinsDTO.put("sumOfPoints", CountSum(player));
+        return countWinsDTO;
+    }
+
+    private Map<String, Object> MakeLbDTO(Player player){
+        Map<String, Object> lbDTO = new LinkedHashMap<String, Object>();
+        lbDTO.put("playerId", player.getId());
+        lbDTO.put("userName", player.getUserName());
+        lbDTO.put("results", CountDifferentResultsDTO(player));
+        return lbDTO;
+    }
+
+    @RequestMapping("/leaderboard")
+    public List<Object> Leaderboard(){
+        return playerRepo
+                .findAll()
+                .stream()
+                .map(onePlayer -> MakeLbDTO(onePlayer))
                 .collect(Collectors.toList());
     }
 

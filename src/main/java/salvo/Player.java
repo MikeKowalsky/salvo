@@ -3,6 +3,7 @@ package salvo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +21,9 @@ public class Player {
 
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
     Set<GamePlayer> gamePlayerSet;
+
+    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
+    Set<Score> scoreSet = new HashSet<Score>();
 
     public Player(){ }
 
@@ -46,6 +50,22 @@ public class Player {
     public void addGamePlayer(GamePlayer gameplayer){
         gameplayer.setPlayer(this);
         gamePlayerSet.add(gameplayer);
+    }
+
+    public void addScore(Score score){
+        score.setPlayer(this);
+        scoreSet.add(score);
+    }
+
+    public Score getScore(Game game){
+        return scoreSet
+                .stream()
+                .filter(oneScore -> oneScore.getGame().equals(game))
+                .findFirst().orElse(null);
+    }
+
+    public Set<Score> getScoreSet() {
+        return scoreSet;
     }
 
     @JsonIgnore

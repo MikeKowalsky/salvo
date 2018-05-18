@@ -21,14 +21,15 @@ public class Game{
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     Set<GamePlayer> gamePlayerSet;
 
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    Set<Score> scoreSet;
+
     public Game(){
         creationDate = new Date();
     }
 
     public Game(long change){
         Date currentDate = new Date();
-//        Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        creationDate = formatter.format(Date.from(currentDate.toInstant().plusSeconds(change)));
         creationDate = Date.from(currentDate.toInstant().plusSeconds(change));
     }
 
@@ -37,8 +38,21 @@ public class Game{
         gamePlayerSet.add(gameplayer);
     }
 
+    public void addScore(Score score){
+        score.setGame(this);
+        scoreSet.add(score);
+    }
+
     public Set<GamePlayer> getGamePlayerSet() {
         return gamePlayerSet;
+    }
+
+    public Set<Score> getScoreSet() {
+        return scoreSet;
+    }
+
+    public boolean hasScore () {
+        return (!getScoreSet().isEmpty()) ? true : false;
     }
 
     public List<Player> getPlayers(){
