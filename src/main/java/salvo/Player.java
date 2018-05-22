@@ -27,6 +27,11 @@ public class Player {
 
     public Player(){ }
 
+    public Player (String userName, String password){
+        this.userName = userName;
+        this.password = password;
+    }
+
     public Player(String name, String userName, String password){
 
         this.name = name;
@@ -76,5 +81,13 @@ public class Player {
     @Override
     public String toString() {
         return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

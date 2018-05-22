@@ -2,10 +2,30 @@
 <html>
 <head> 
 	<title>Salvo - Games</title>
-
 	<link rel="stylesheet" type="text/css" href="styles/games.css">
 </head>
 <body>
+
+<div id="userName">
+</div>
+
+
+<form id="login-form" onsubmit="login(event)">
+	<div><label>Username: <input type="text" name="name"></label></div>
+	<div><label>Password: <input type="text" name="pwd"></label></div>
+	<button>Log in</button>
+</form>
+
+<form id="logout-form" onsubmit=logout()>
+	<button>Log out</button>
+</form>
+
+<form id="signin-form" onsubmit="signin(event)">
+	<div><label>Username: <input type="text" name="name"></label></div>
+	<div><label>Password: <input type="text" name="pwd"></label></div>
+	<button>Sign in</button>
+</form>
+
 
 <h1>Leaderboard</h1>
 

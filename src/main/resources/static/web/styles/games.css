@@ -1,4 +1,11 @@
 
+#userName > div {
+    padding: 5px;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
 #leaderboard{
     border-collapse: collapse;
 }

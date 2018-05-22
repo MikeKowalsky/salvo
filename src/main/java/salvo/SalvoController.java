@@ -1,9 +1,11 @@
 package salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,13 +74,33 @@ public class SalvoController {
     }
 
 
-    @RequestMapping("/games")
+//    @RequestMapping("/games")
     public List<Object> GameIDs(){
         return gameRepo
                 .findAll()
                 .stream()
                 .map(oneGame -> MakeGameDTO(oneGame))
                 .collect(Collectors.toList());
+    }
+
+    @RequestMapping("/games")
+    public Map<String, Object> test(Authentication authentication){
+        Map<String, Object> newGameDTO = new LinkedHashMap<String, Object>();
+        if (isGuest(authentication)){
+            newGameDTO.put("player", null);
+        } else {
+            newGameDTO.put("player", MakePlayerDTO(loggedInPlayer(authentication)));
+        }
+        newGameDTO.put("games", GameIDs());
+        return newGameDTO;
+    }
+
+    public Player loggedInPlayer(Authentication authentication){
+        return playerRepo.findByUserName(authentication.getName());
+    }
+
+    private boolean isGuest(Authentication authentication) {
+        return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
 
     private Double CountSum (Player player){
@@ -210,6 +232,27 @@ public class SalvoController {
         gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemySalvoSet(GetEnemyGamePlayer(gp))));
 
         return gameWithUserMap;
+    }
+
+    @RequestMapping(path = "/players", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createPlayer(String username, String password) {
+//        if (username.isEmpty()) {
+//            return new ResponseEntity<>(makeMap("error", "Invalid name"), HttpStatus.FORBIDDEN);
+//        }
+
+        Player player = playerRepo.findByUserName(username);
+        if (player != null) {
+            return new ResponseEntity<>(makeMap("error", "Username already exists"), HttpStatus.FORBIDDEN);
+        }
+
+        Player newPlayer = playerRepo.save(new Player(username, password));
+        return new ResponseEntity<>(makeMap("Username", newPlayer.getUserName()), HttpStatus.CREATED);
+    }
+
+    private Map<String, Object> makeMap(String key, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
+        return map;
     }
 
 }
