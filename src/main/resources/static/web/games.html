@@ -9,23 +9,18 @@
 <div id="userName">
 </div>
 
-
-<form id="login-form" onsubmit="login(event)">
+<form id="login-form" onsubmit="return false">
 	<div><label>Username: <input type="text" name="name"></label></div>
 	<div><label>Password: <input type="text" name="pwd"></label></div>
-	<button>Log in</button>
+	<!--<input type="button" id="logInButton" name="logInButton">Log in</input>-->
+	<!--<input type="button" id="signInButton" name="signInButton">Sign in</input>-->
+	<button id="logInButton" name="logInButton">Log in</button>
+	<button id="signInButton" name="signInButton">Sign in</button>
 </form>
 
 <form id="logout-form" onsubmit=logout()>
 	<button>Log out</button>
 </form>
-
-<form id="signin-form" onsubmit="signin(event)">
-	<div><label>Username: <input type="text" name="name"></label></div>
-	<div><label>Password: <input type="text" name="pwd"></label></div>
-	<button>Sign in</button>
-</form>
-
 
 <h1>Leaderboard</h1>
 

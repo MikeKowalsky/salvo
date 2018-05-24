@@ -1,14 +1,15 @@
 
 $(document).ready(function(){
 
-    $('#logout-form').hide();
     getLeaderboardJSON();
     getGamesJSON();
+    activateEventsListeners();
 
 });
 
 function getLeaderboardJSON(){
     $.getJSON("../api/leaderboard", function(leaderboardJSON) {
+        cleanLeaderboard();
         printLeaderboard (leaderboardJSON);
     });
 }
@@ -17,47 +18,71 @@ function getGamesJSON() {
     $.getJSON("../api/games", function(gamesJSON) {
         console.log(gamesJSON);
 
-        if (gamesJSON.player != null){
+        if (isUserLoggedIn(gamesJSON.player)){
             cleanMainGameList();
             printMainGameList (gamesJSON);
             printUserName(gamesJSON.player);
+            $('#logout-form').show();
         } else {
             printMainGameList (gamesJSON);
+            $('#logout-form').hide();
         }
-
     });
 }
 
-function login(evt) {
-    evt.preventDefault();
-    let form = evt.target;
+function login(form) {
     $.post("/api/login",
-            { name: form["name"].value,
-             pwd: form["pwd"].value })
+            { name: form[0]["name"].value,
+             pwd: form[0]["pwd"].value })
         .done(function() {
             console.log("logged in!");
             getGamesJSON();
-            $('#logout-form').show();
+        })
+        .fail(function(resp){
+            console.log(resp);
+            alert('Something went wrong! Error code: ' + resp.status + ', text: ' + resp.responseJSON.error);
         });
-
 }
 
-function logout(evt) {
-    // evt.preventDefault();
+
+function logout() {
     $.post("/api/logout")
         .done(function() { console.log("logged out"); });
 }
 
-function signin(evt) {
-    evt.preventDefault();
-    let form = evt.target;
+function signin(form) {
     $.post("/api/players",
-        {username: form["name"].value,
-        password: form["pwd"].value})
+        {name: form[0]["name"].value,
+        pwd: form[0]["pwd"].value})
         .done(function () {
             console.log("new player created");
             getLeaderboardJSON();
+        })
+        .fail(function(resp){
+            console.log(resp);
+            alert('Sometging went wrong. Error code: ' + resp.status + ', message: ' + resp.responseJSON.error);
         });
+}
+
+function activateEventsListeners(){
+
+    $('#logInButton').click(function(){
+        let form = $("#login-form");
+        login(form);
+    });
+
+    $('#signInButton').click(function(){
+        let form = $("#login-form");
+        signin(form);
+    });
+}
+
+function isUserLoggedIn(player) {
+    return (player != null) ? true : false
+}
+
+function cleanLeaderboard() {
+    $('#leaderboard').empty()
 }
 
 function printLeaderboard (lb){
@@ -95,7 +120,6 @@ function cleanMainGameList(){
 
 function printUserName(player) {
     $('#login-form').hide();
-    $('#signin-form').hide();
     $('#userName').append('<div>User name: ' + player.email + '</div>')
 }
 

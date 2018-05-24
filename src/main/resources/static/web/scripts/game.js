@@ -11,6 +11,11 @@ $(document).ready(function(){
 
 });
 
+function logout() {
+    $.post("/api/logout")
+        .done(function() { window.location = '/web/games.html' });
+}
+
 function printGamePage(data, gpId){
 
     let playerId = getPlayerId(data,gpId);

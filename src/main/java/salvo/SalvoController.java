@@ -235,17 +235,17 @@ public class SalvoController {
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> createPlayer(String username, String password) {
+    public ResponseEntity<Map<String, Object>> createPlayer(String name, String pwd) {
 //        if (username.isEmpty()) {
 //            return new ResponseEntity<>(makeMap("error", "Invalid name"), HttpStatus.FORBIDDEN);
 //        }
 
-        Player player = playerRepo.findByUserName(username);
+        Player player = playerRepo.findByUserName(name);
         if (player != null) {
             return new ResponseEntity<>(makeMap("error", "Username already exists"), HttpStatus.FORBIDDEN);
         }
 
-        Player newPlayer = playerRepo.save(new Player(username, password));
+        Player newPlayer = playerRepo.save(new Player(name, pwd));
         return new ResponseEntity<>(makeMap("Username", newPlayer.getUserName()), HttpStatus.CREATED);
     }
 
