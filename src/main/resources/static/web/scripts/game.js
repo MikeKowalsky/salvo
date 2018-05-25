@@ -55,7 +55,11 @@ function printGamePage(data, gpId){
 
     header(data, gpId);
     printGrid('#grid');
-    printGrid('#salvoGrid');
+    if (enemyExist(data)){
+        printGrid('#salvoGrid');
+    } else {
+        $('#playerTwo').hide();
+    }
     markGrids(data, gpId);
     let shipsLocationArray = markShips(data);
     markSalvos(data, playerId, 'owner', shipsLocationArray);
@@ -81,8 +85,18 @@ function getPlayerId(data, gpId) {
     return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[0].player.id : data.gamePlayers[1].player.id;
 }
 
+function enemyExist(data) {
+    console.log((data.gamePlayers.length == 2) ? true : false);
+    return (data.gamePlayers.length == 2) ? true : false;
+}
+
 function getEnemyId(data, gpId) {
-    return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[1].player.id : data.gamePlayers[0].player.id;
+    if (enemyExist(data)) {
+        return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[1].player.id : data.gamePlayers[0].player.id;
+    } else {
+        return null;
+    }
+
 }
 
 function header(dataFromAjaxCall, gamePlayerId) {
@@ -90,7 +104,11 @@ function header(dataFromAjaxCall, gamePlayerId) {
     $('#gameNo').append('<h2>Game id: '+ dataFromAjaxCall.gameId + ' , Created:  '
         + new Date(dataFromAjaxCall.created) + '</h2>');
     $('#gameNo').append('<p id="p1">Player One: ' + dataFromAjaxCall.gamePlayers[0].player.email + '</p>');
-    $('#gameNo').append('<p id="p2">Player Two: ' + dataFromAjaxCall.gamePlayers[1].player.email + '</p>');
+    if (enemyExist(dataFromAjaxCall)){
+        $('#gameNo').append('<p id="p2">Player Two: ' + dataFromAjaxCall.gamePlayers[1].player.email + '</p>');
+    } else {
+        $('#gameNo').append('<p id="p2">Player Two: N/A</p>');
+    }
 
 
     if (gamePlayerId == dataFromAjaxCall.gamePlayers[0].id){
@@ -128,7 +146,9 @@ function printGrid(elementID) {
 function markGrids(dataFromAjaxCall, gamePlayerId) {
     if (gamePlayerId == dataFromAjaxCall.gamePlayers[0].id){
         $('#gridOne').append('<p>' + dataFromAjaxCall.gamePlayers[0].player.email + '(you)</p>').addClass('bold');
-        $('#gridTwo').append('<p>' + dataFromAjaxCall.gamePlayers[1].player.email + '</p>');
+        if (enemyExist(dataFromAjaxCall)) {
+            $('#gridTwo').append('<p>' + dataFromAjaxCall.gamePlayers[1].player.email + '</p>');
+        }
     } else {
         $('#gridOne').append('<p>' + dataFromAjaxCall.gamePlayers[1].player.email + '(you)</p>').addClass('bold');
         $('#gridTwo').append('<p>' + dataFromAjaxCall.gamePlayers[0].player.email + '</p>');

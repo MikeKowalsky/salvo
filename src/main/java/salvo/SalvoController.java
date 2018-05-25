@@ -194,11 +194,6 @@ public class SalvoController {
         gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.getGame().getGamePlayerSet()));
         gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
         gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemySalvoSet(GetEnemyGamePlayer(gp))));
-//        if(!isGuest(authentication)) {
-//            gameWithUserMap.put("loggedIn", authentication.getName());
-//        } else {
-//            gameWithUserMap.put("loggedIn", null);
-//        }
 
         if (!isGuest(authentication)){
             Player loggedInPlayer = playerRepo.findByUserName(authentication.getName());
@@ -246,6 +241,43 @@ public class SalvoController {
 
         Player newPlayer = playerRepo.save(new Player(name, pwd));
         return new ResponseEntity<>(makeMap("Username", newPlayer.getUserName()), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(path = "/games", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createGame(Authentication authentication){
+
+        if (isGuest(authentication)){
+            return new ResponseEntity<>(makeMap("error", "You need to be logged in"), HttpStatus.UNAUTHORIZED);
+        } else {
+            Game newGame = gameRepo.save(new Game());
+            Player currentPlayer = playerRepo.findByUserName(authentication.getName());
+            GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, newGame));
+
+            return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
+        }
+
+    }
+
+    @RequestMapping(path = "/game/{gameId}/players", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> joinGame(Authentication authentication, @PathVariable Long gameId){
+
+        if (isGuest(authentication)){
+            return new ResponseEntity<>(makeMap("error", "You need to be logged in"), HttpStatus.UNAUTHORIZED);
+        } else {
+            if(gameRepo.existsById(gameId)){
+                Game currentGame = gameRepo.findOne(gameId);
+                if(currentGame.getGamePlayerSet().size() < 2){
+                    Player currentPlayer = playerRepo.findByUserName(authentication.getName());
+                    GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, currentGame));
+                    return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
+                } else {
+                    return new ResponseEntity<>(makeMap("error", "Game is full"), HttpStatus.FORBIDDEN);
+                }
+            } else {
+                return new ResponseEntity<>(makeMap("error", "No such a game"), HttpStatus.FORBIDDEN);
+            }
+
+        }
     }
 
     private Map<String, Object> makeMap(String key, Object value) {

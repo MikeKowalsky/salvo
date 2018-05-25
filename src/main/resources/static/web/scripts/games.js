@@ -21,11 +21,12 @@ function getGamesJSON() {
         if (isAnyUserLoggedIn(gamesJSON.player)){
             cleanMainGameList();
             printMainGameList (gamesJSON);
-            printUserName(gamesJSON.player);
+            printUserNameAndShowButtons(gamesJSON.player);
             $('#logout-form').show();
         } else {
             printMainGameList (gamesJSON);
             $('#logout-form').hide();
+            $('#newGame').hide();
         }
     });
 }
@@ -118,64 +119,71 @@ function cleanMainGameList(){
     $('#gameList').empty();
 }
 
-function printUserName(player) {
+function printUserNameAndShowButtons(player) {
     $('#login-form').hide();
-    $('#userName').append('<div>User name: ' + player.email + '</div>')
+    $('#userName').append('<div>User name: ' + player.email + '</div>');
+    $('#newGame').show();
 }
 
-function printMainGameList (games){
-	console.log(games);
+function printMainGameList (games) {
+    console.log(games);
     let loggedInUserId;
 
-	(isAnyUserLoggedIn(games.player)) ? loggedInUserId = games.player.id : loggedInUserId = null;
+    (isAnyUserLoggedIn(games.player)) ? loggedInUserId = games.player.id : loggedInUserId = null;
     console.log('logged in user ID: ' + loggedInUserId);
 
-	games.games.forEach((game) => {
-		let creationDate = new Date(game.created);
-		let playerTwo;
-		let scoresResult;
-		let scores;
-		let gamePlayerForLoggidInUser = setGamePlayerIdForLoggedInUser(loggedInUserId, game);
+    games.games.forEach((game) => {
+        let creationDate = new Date(game.created);
+        let playerTwo;
+        let scoresResult;
+        let scores;
+        let gamePlayerForLoggidInUser = setGamePlayerIdForLoggedInUser(loggedInUserId, game);
 
-		(game.gamePlayers.length < 2) ?
-			playerTwo = "N/A" :
-			playerTwo = game.gamePlayers[1].player.email;
+        (game.gamePlayers.length < 2) ?
+            playerTwo = "N/A" :
+            playerTwo = game.gamePlayers[1].player.email;
 
         if (game.scores != undefined) {
             let scoreP0 = game.scores[0].score;
             let scoreP1 = game.scores[1].score;
-			if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[0].player.id){
+            if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[0].player.id) {
                 scoresResult = game.gamePlayers[0].player.email;
-			} else if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[1].player.id) {
+            } else if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[1].player.id) {
                 scoresResult = game.gamePlayers[1].player.email;
-            } else if (scoreP0 == scoreP1){
+            } else if (scoreP0 == scoreP1) {
                 scoresResult = 'tie';
-			} else if (scoreP0 < scoreP1 && game.scores[1].playerId == game.gamePlayers[0].player.id){
+            } else if (scoreP0 < scoreP1 && game.scores[1].playerId == game.gamePlayers[0].player.id) {
                 scoresResult = game.gamePlayers[0].player.email;
-			} else {
+            } else {
                 scoresResult = game.gamePlayers[1].player.email;
-			}
+            }
 
             scores = (scoresResult == 'tie') ?
-				'Game finished. Result: tie.' : 'Game finished. Player ' + scoresResult + ' won.';
-		} else {
-        	scores = 'Game is not finished yet.';
-		}
+                'Game finished. Result: tie.' : 'Game finished. Player ' + scoresResult + ' won.';
+        } else {
+            scores = 'Game is not finished yet.';
+        }
 
         // rendering game list with link to game, if logged in player is in this game
         if (game.gamePlayers[0].player.id == loggedInUserId ||
-            (playerTwo != "N/A" && game.gamePlayers[1].player.id == loggedInUserId)){
-            $("#gameList").append("<li><a href='/web/game.html?gp=" + gamePlayerForLoggidInUser + "'>ID: " + game.id + ", Created: " + creationDate + ",</a><br>\
+            (playerTwo != "N/A" && game.gamePlayers[1].player.id == loggedInUserId)) {
+            $("#gameList").append("<li><a href='/web/game.html?gp=" + gamePlayerForLoggidInUser + "'>\
+                ID: " + game.id + ", Created: " + creationDate + ",</a><br>\
 			Player One: " + game.gamePlayers[0].player.email + ",<br>\
-			Player Two: " 	+ playerTwo + "<br>" +
+			Player Two: " + playerTwo + "<br>" +
                 scores + "<br><br></li>");
         } else {
             $("#gameList").append("<li>ID: " + game.id + ", Created: " + creationDate + ",<br>\
 			Player One: " + game.gamePlayers[0].player.email + ",<br>\
-			Player Two: " 	+ playerTwo + "<br>" +
-            scores + "<br><br></li>");
+			Player Two: " + playerTwo + "<br>" +
+                scores + "<br><br></li>");
         }
-	});
+
+        if (showJoinButton(games.player, game, loggedInUserId)) {
+            $('#gameList').append("<button data-gameId=" + game.id + " onclick=joinGame(" + game.id + ")>" +
+                "Join game " + game.id + " with " + game.gamePlayers[0].player.email + "</button><br><br>");
+        }
+    });
 }
 
 function setGamePlayerIdForLoggedInUser(loggedInPlayerID, oneGame){
@@ -187,4 +195,44 @@ function setGamePlayerIdForLoggedInUser(loggedInPlayerID, oneGame){
     } else {
         return null;
     }
+}
+
+function createNewGame() {
+    $.post("/api/games")
+        .done(function(resp) {
+            console.log("new game created!");
+            console.log(resp);
+            window.location = makeUrlForNewGameOrJoin(resp);
+
+        })
+        .fail(function(resp){
+            console.log(resp);
+            alert('Something went wrong!');
+        });
+}
+
+function makeUrlForNewGameOrJoin(data){
+    return '/web/game.html?gp=' + data.GamePlayerID;
+}
+
+function showJoinButton(player, game, loggedInUserId) {
+    if(!isAnyUserLoggedIn(player) || game.gamePlayers.length > 1 || game.gamePlayers[0].player.id == loggedInUserId){
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function joinGame(gameID) {
+    $.post("/api/game/" + gameID + "/players")
+        .done(function(resp) {
+            console.log("you joined game " + gameID);
+            console.log(resp);
+            window.location = makeUrlForNewGameOrJoin(resp);
+
+        })
+        .fail(function(resp){
+            console.log(resp);
+            alert('Something went wrong!');
+        });
 }
