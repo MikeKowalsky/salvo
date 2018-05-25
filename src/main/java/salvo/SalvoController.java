@@ -73,8 +73,6 @@ public class SalvoController {
         return gameDTO;
     }
 
-
-//    @RequestMapping("/games")
     public List<Object> GameIDs(){
         return gameRepo
                 .findAll()
@@ -97,10 +95,6 @@ public class SalvoController {
 
     public Player loggedInPlayer(Authentication authentication){
         return playerRepo.findByUserName(authentication.getName());
-    }
-
-    private boolean isGuest(Authentication authentication) {
-        return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
 
     private Double CountSum (Player player){
@@ -172,13 +166,6 @@ public class SalvoController {
         return (enemy.isPresent()) ? enemy.get() : gamePlayerOwner;
     }
 
-//    private Map<String, Object> MakeSalvoTurnsDTO(Salvo salvo){
-//        Map<String, Object> salvoTurnsDTO = new LinkedHashMap<String, Object>();
-//        salvoTurnsDTO.put("turnNo", salvo.getTurnNumber());
-//        salvoTurnsDTO.put("locations", salvo.getLocations());
-//        return salvoTurnsDTO;
-//    }
-
     private Map<String, Object> MakeSalvoDTO(Salvo salvo){
         Map<String, Object> salvoDTO = new LinkedHashMap<String, Object>();
         salvoDTO.put("playerId", salvo.getGamePlayer().getPlayer().getId());
@@ -186,13 +173,6 @@ public class SalvoController {
         salvoDTO.put("locations", salvo.getLocations());
         return salvoDTO;
     }
-
-//    private Map<String, Object> MakeSalvoDTO(Salvo salvo){
-//        Map<String, Object> salvoDTO = new LinkedHashMap<String, Object>();
-//        salvoDTO.put("player ID", salvo.getGamePlayer().getPlayer().getId());
-//        salvoDTO.put("salvoes", MakeSalvoTurnsDTO(salvo));
-//        return salvoDTO;
-//    }
 
     private Set<Object> MakeSalvoSetDTO (Set<Salvo> salvos, Set<Salvo> enemysSet){
         salvos.addAll(enemysSet);
@@ -203,24 +183,8 @@ public class SalvoController {
     }
 
 
-//    private Set<Object> MakeSalvoSetDTO (Set<Salvo> salvos, Set<Salvo> enemysSet){
-////        salvos.addAll(enemysSet);
-//        Set<Object> ownersObjectSet = salvos
-//                .stream()
-//                .map(salvo -> MakeSalvoDTO(salvo))
-//                .collect(Collectors.toSet());
-//
-//        Set<Object> enemysObjectSet = enemysSet
-//                .stream()
-//                .map(salvo -> MakeSalvoDTO(salvo))
-//                .collect(Collectors.toSet());
-//
-//        ownersObjectSet.addAll(enemysObjectSet);
-//        return ownersObjectSet;
-//    }
-
     @RequestMapping("/game_view/{gamePlayerId}")
-    public Map<String, Object> singleGameView (@PathVariable Long gamePlayerId){
+    public Map<String, Object> singleGameView (Authentication authentication, @PathVariable Long gamePlayerId) throws UserIsNotAuthorized, NoLoggedInUser{
 
         GamePlayer gp = gamePlayerRepo.findOne(gamePlayerId);
 
@@ -230,8 +194,43 @@ public class SalvoController {
         gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.getGame().getGamePlayerSet()));
         gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
         gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemySalvoSet(GetEnemyGamePlayer(gp))));
+//        if(!isGuest(authentication)) {
+//            gameWithUserMap.put("loggedIn", authentication.getName());
+//        } else {
+//            gameWithUserMap.put("loggedIn", null);
+//        }
 
-        return gameWithUserMap;
+        if (!isGuest(authentication)){
+            Player loggedInPlayer = playerRepo.findByUserName(authentication.getName());
+            if(loggedInPlayer == gp.getPlayer()){
+                gameWithUserMap.put("loggedInName", gp.getPlayer().getUserName());
+                return gameWithUserMap;
+            } else {
+                throw new UserIsNotAuthorized ("Unauthorized user");
+            }
+        } else {
+            throw new NoLoggedInUser("Log in first");
+        }
+
+//        return gameWithUserMap;
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    private class UserIsNotAuthorized extends Exception{
+        public UserIsNotAuthorized (String message){
+            super(message);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    private class NoLoggedInUser extends Exception{
+        public NoLoggedInUser (String message){
+            super(message);
+        }
+    }
+
+    private boolean isGuest(Authentication authentication) {
+        return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)

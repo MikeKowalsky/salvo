@@ -1,12 +1,28 @@
 
 $(document).ready(function(){
 
+    $('#errorDiv').hide();
+
     let gamePlayerId = GetQueryString();
     console.log(gamePlayerId);
 
-    $.ajax({url: makeUrl(gamePlayerId.gp), success: function(result){
-            console.log(result);
-            printGamePage(result, gamePlayerId.gp);
+    $.ajax({url: makeUrl(gamePlayerId.gp),
+            statusCode: {
+                401: function () {
+                    console.log( "unauthorized" );
+                    hideAllBecauseErrorAndShowErrorDiv();
+                    handleError(401);
+
+                },
+                403: function() {
+                    console.log( "log in first" );
+                    hideAllBecauseErrorAndShowErrorDiv();
+                    handleError(403);
+                }
+            },
+            success: function(result){
+                console.log(result);
+                printGamePage(result, gamePlayerId.gp);
     }});
 
 });
@@ -14,6 +30,22 @@ $(document).ready(function(){
 function logout() {
     $.post("/api/logout")
         .done(function() { window.location = '/web/games.html' });
+}
+
+function hideAllBecauseErrorAndShowErrorDiv() {
+    $('#logout-form').hide();
+    $('#gameNo').hide();
+    $('#twoGrids').hide();
+    $('#errorDiv').show();
+}
+
+function handleError(code) {
+    if (code == 401){
+        $('#errorMsg').append('Error code: ' + code + ', you are unauthorized.');
+    } else if (code == 403) {
+        $('#errorMsg').append('Error code: ' + code + ', please go back to game list site and log in first.');
+    }
+
 }
 
 function printGamePage(data, gpId){
