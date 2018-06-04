@@ -143,6 +143,31 @@ function printGrid(elementID) {
     }
 }
 
+function ship_test(){
+
+    let gpID = GetQueryString();
+    let url = "/api/games/players/" + gpID.gp + "/ships";
+
+    $.post({
+        url: url,
+        data: JSON.stringify([ { type: "destroyer", locations: ["E1", "F1", "G1"] },
+            { type: "patrol boat", locations: ["I5", "I6"] }
+        ]),
+        dataType: "text",
+        contentType: "application/json"
+        })
+        .done(function(resp) {
+            console.log("ship added");
+            console.log(resp);
+            window.location = "/web/game.html?gp=" + gpID.gp;
+
+        })
+        .fail(function(resp){
+            console.log(resp);
+            alert('Something went wrong!');
+        });
+}
+
 function markGrids(dataFromAjaxCall, gamePlayerId) {
     if (gamePlayerId == dataFromAjaxCall.gamePlayers[0].id){
         $('#gridOne').append('<p>' + dataFromAjaxCall.gamePlayers[0].player.email + '(you)</p>').addClass('bold');

@@ -12,4 +12,6 @@ import java.util.List;
 @RepositoryRestResource
 public interface GamePlayerRepository extends JpaRepository<GamePlayer, Long> {
     List<GamePlayer> findByEnterDate(Date enterDate);
+
+    boolean existsById(Long id);
 }

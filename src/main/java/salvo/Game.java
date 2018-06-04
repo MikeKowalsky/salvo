@@ -66,5 +66,9 @@ public class Game{
     public Date getCreationDate() {
         return creationDate;
     }
+
+    public boolean isFull() {
+        return this.getGamePlayerSet().size() == 2;
+    }
 }
 

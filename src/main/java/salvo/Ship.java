@@ -26,10 +26,10 @@ public class Ship {
         this.shipType = type;
     }
 
-//    public Ship (String type, List<String> locations) {
-//        this.shipType = type;
-//        this.locations = locations;
-//    }
+    public Ship (String type, List<String> locations) {
+        this.shipType = type;
+        this.locations = locations;
+    }
 
     public long getId() {
         return id;
