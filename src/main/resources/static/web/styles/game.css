@@ -79,3 +79,73 @@ table {
 .bold {
     font-weight: bold;
 }
+
+/* SHIPS */
+#aircraftCarrierMark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    background-color: aquamarine;
+}
+
+#battleshipMark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    background-color: aquamarine;
+}
+
+#submarineMark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    background-color: aquamarine;
+}
+
+#destroyerMark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    background-color: aquamarine;
+}
+
+#patrolBoatMark {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+
+    text-align: center;
+    vertical-align: middle;
+
+    background-color: aquamarine;
+}
+
+/* PLACING & SAVING SHIPS */
+
+.placingShip {
+    background-color: green;
+}
+
+.placingShipShadow {
+    background-color: darkgrey;
+}
+
+.saveShip {
+    background-color: darkorange;
+}

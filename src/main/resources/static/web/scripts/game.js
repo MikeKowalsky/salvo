@@ -24,7 +24,6 @@ $(document).ready(function(){
                 console.log(result);
                 printGamePage(result, gamePlayerId.gp);
     }});
-
 });
 
 function logout() {

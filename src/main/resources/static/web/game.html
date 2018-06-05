@@ -28,13 +28,46 @@
         <button onclick="ship_test()">Test</button>
     </div>
 
-
     <div id="gameNo"></div>
+
+    <br><br>
+    <div id="shipChoose">
+        <input type="radio" name="shipType" id="aircraftCarrier" onclick="isShipRadioButtonClicked()">
+        <label for="aircraftCarrier">Aircraft Carrier (size: 5)</label><br>
+        <div id="aircraftCarrierMark" draggable="true" ondragstart="drag(event)"></div>
+        <br>
+        <input type="radio" name="shipType" id="battleship" onclick="isShipRadioButtonClicked()">
+        <label for="battleship">Battleship (size: 4)</label><br>
+        <div id="battleshipMark" draggable="true" ondragstart="drag(event)"></div>
+        <br>
+        <input type="radio" name="shipType" id="submarine" onclick="isShipRadioButtonClicked()">
+        <label for="submarine">Submarine (size: 3)</label><br>
+        <div id="submarineMark" draggable="true" ondragstart="drag(event)"></div>
+        <br>
+        <input type="radio" name="shipType" id="destroyer" onclick="isShipRadioButtonClicked()">
+        <label for="destroyer">Destroyer (size: 3)</label><br>
+        <div id="destroyerMark" draggable="true" ondragstart="drag(event)"></div>
+        <br>
+        <input type="radio" name="shipType" id="patrolBoat" onclick="isShipRadioButtonClicked()">
+        <label for="patrolBoat">Patrol Boat (size: 2)</label><br>
+        <div id="patrolBoatMark" draggable="true" ondragstart="drag(event)"></div>
+        <br>
+    </div>
+
+    <br><br>
+    <div id="orientationChoose">
+        <input type="radio" name="orientation" id="horizontal" checked>
+        <label for="horizontal">Horizontal</label><br>
+        <input type="radio" name="orientation" id="portrait">
+        <label for="portrait">Portrait</label><br>
+    </div>
+
     <br>
     <div id="twoGrids">
         <div>
             <div id="gridOne"></div>
-            <div id="grid"></div>
+            <!--<div id="grid"></div>-->
+            <div id="grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         </div>
         <div id="playerTwo">
             <div id="gridTwo"></div>
@@ -50,6 +83,7 @@
         crossorigin="anonymous">
 </script>
 <script src="/web/scripts/game.js"></script>
+<script src="/web/scripts/gamePlacingShips.js"></script>
 
 </body>
 </html>
