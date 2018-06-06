@@ -1,16 +1,33 @@
 
-$(document).ready(function(){
+// $(document).ready(function(){
+// });
 
-    hideShipMarks();
+function makeSavedShipsObject() {
 
-});
+    // console.log('in');
 
-function hideShipMarks() {
-    $('#aircraftCarrierMark').hide();
-    $('#battleshipMark').hide();
-    $('#submarineMark').hide();
-    $('#destroyerMark').hide();
-    $('#patrolBoatMark').hide();
+    let savedShipsObject = {"aircraftCarrier": [],
+                            "battleship": [],
+                            "submarine": [],
+                            "destroyer": [],
+                            "patrolBoat": []};
+
+    let recivedDataArray = [];
+
+    $(".savedShip").each(function () {
+        // console.log($(this).data("info"));
+        recivedDataArray.push($(this).data("info"));
+    });
+    // console.log(recivedDataArray);
+
+    for(let key in savedShipsObject){
+        recivedDataArray.forEach(gridLocation => {
+            if(key == gridLocation.shipType){
+                savedShipsObject[key].push(gridLocation.location);
+            }
+        });
+    }
+    // console.log(savedShipsObject);
 }
 
 function whichShipIsOn() {
@@ -22,18 +39,14 @@ function whichShipIsOn() {
             return shipButtonsIDs[i];
         }
     }
-
 }
 
 function isShipRadioButtonClicked() {
 
     let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-    // let shipType = whichShipIsOn();
-    // let elementID = '#' + shipType + 'Mark';
-    // $(elementID).show();
-    handleOnMouseOver(buildGridIdsArray(vertical), vertical);
     handleOnClick(buildGridIdsArray(vertical), vertical);
+    handleOnMouseOver(buildGridIdsArray(vertical), vertical);
 
 }
 
@@ -49,31 +62,55 @@ function buildGridIdsArray(vertical){
 }
 
 function handleOnMouseOver(IDs, vertical) {
-    // document.onmouseover = function(e) {
-    //     if (IDs.includes(e.target.id)){
-    //         // console.log(e.target.id);
-    //         $('#grid *').removeClass('placingShip');
-    //         showShip(e.target.id, vertical)
-    //     }
-    // }
 
-    $('#grid *').mouseover(function (e) {
+    $('#grid *').on("mouseover", function (e) {
         if (IDs.includes(e.target.id)) {
             $('#grid *').removeClass('placingShip');
+            $('#grid *').removeClass('notAllowed');
             // console.log(e.target.id);
-            showShip(e.target.id, vertical, false);
+            showOrSaveShip(e.target.id, vertical, false);
         }
     });
 }
 
 function handleOnClick(IDs, vertical) {
 
-    $('#grid *').click(function (e) {
+    $('#grid *').on("click", function (e) {
         if (IDs.includes(e.target.id)) {
             console.log(e.target.id);
-            showShip(e.target.id, vertical, true);
+            showOrSaveShip(e.target.id, vertical, true);
+
+            //deactivate 'this' shipRadioButton
+            $("input[name='shipType']").each(function(){
+                if (this.checked == true){
+                    // console.log(this.id);
+                    this.checked = false;
+                    this.disabled = true;
+                    $("label[for='" + this.id + "']").addClass('through');
+                }
+            });
         }
+
+        //save, when all are located, ships position
+        let placedShipsCounter = 0;
+        $("input[name='shipType']").each(function(){
+            if(this.disabled == true){
+                placedShipsCounter++;
+                if(placedShipsCounter == 5){
+                    makeSavedShipsObject();
+                }
+            }
+        });
+        // if ($('#aircraftCarrier').disabled == true &&
+        //     // $('#battleship').disabled == true &&
+        //     // $('#submarine').disabled == true &&
+        //     // $('#destroyer').disabled == true &&
+        //     $('#patrolBoat').disabled == true){
+        //     makeSavedShipsObject();
+        // }
     });
+
+
 }
 
 function whatOrientation() {
@@ -86,7 +123,7 @@ function whatOrientation() {
     }
 }
 
-function showShip(pointer, vertical, save) {
+function showOrSaveShip(pointer, vertical, save) {
 
     let currentShip = whichShipIsOn();
     let currentOrient = whatOrientation();
@@ -94,35 +131,69 @@ function showShip(pointer, vertical, save) {
     let pointerCol = (pointer.charAt(2) == '0') ? '10' : pointer.charAt(1);
     // console.log("PointerRow: " + pointerRow + " / PointerCol: " + pointerCol + " / " + currentShip + " / " + currentOrient);
 
+
+    let shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
+
+    switch (currentOrient) {
+        case 'horizontal':
+            for(let i = pointerCol; i < (parseInt(pointerCol) + shipDO[currentShip]); i++){
+                if (isPositionAllowed(pointerCol, 'horizontal', currentShip)){
+                    (save) ? addSaveClassAndCreateData(pointerRow + i, currentShip) : addPlacingShipClass(pointerRow + i);
+                } else {
+                    addNotAllowedClass(pointerRow + i);
+                }
+            }
+            break;
+        case 'portrait':
+            let shipRows;
+            shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + shipDO[currentShip]));
+            for(let i = 0; i < shipRows.length; i++){
+                if (isPositionAllowed(pointerRow, 'portrait', currentShip)){
+                    (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, currentShip) : addPlacingShipClass(shipRows[i] + pointerCol);
+                } else {
+                    addNotAllowedClass(shipRows[i] + pointerCol);
+                }
+            }
+            break;
+    }
+
+
+    // tutej
+    /*
     let shipRows;
     switch (currentOrient){
         case 'horizontal':
             switch (currentShip){
                 case 'aircraftCarrier':
                     for(let i = pointerCol; i < (parseInt(pointerCol) + 5); i++){
-                        // console.log('\'#' + pointerRow + i + '\'');
-                        (save) ? addSaveShipClass(pointerRow + i) : addPlacingShipClass(pointerRow + i);
+                        // (save) ? addSaveClassAndCreateData(pointerRow + i, 'aircraftCarrier') : addPlacingShipClass(pointerRow + i);
+                        if (isPositionAllowed(pointerCol ,'horizontal', 'aircraftCarrier')){
+                            (save) ? addSaveClassAndCreateData(pointerRow + i, 'aircraftCarrier') : addPlacingShipClass(pointerRow + i);
+                        } else {
+                            addNotAllowedClass(pointerRow + i);
+                        }
+                        // (isPositionAllowed(pointerCol ,'horizontal', 'aircraftCarrier')) ? addPlacingShipClass(pointerRow + i) : addNotAllowedClass(pointerRow + i);
                     }
                     break;
                 case 'battleship':
                     for(let i = pointerCol; i < (parseInt(pointerCol) + 4); i++){
-                        (save) ? addSaveShipClass(pointerRow + i) : addPlacingShipClass(pointerRow + i);
+                        (save) ? addSaveClassAndCreateData(pointerRow + i, 'battleship') : addPlacingShipClass(pointerRow + i);
                     }
                     break;
                 case 'submarine':
                     for(let i = pointerCol; i < (parseInt(pointerCol) + 3); i++){
-                        (save) ? addSaveShipClass(pointerRow + i) : addPlacingShipClass(pointerRow + i);
+                        (save) ? addSaveClassAndCreateData(pointerRow + i, 'submarine') : addPlacingShipClass(pointerRow + i);
                     }
                     break;
                 case 'destroyer':
                     for(let i = pointerCol; i < (parseInt(pointerCol) + 3); i++){
-                        (save) ? addSaveShipClass(pointerRow + i) : addPlacingShipClass(pointerRow + i);
+                        (save) ? addSaveClassAndCreateData(pointerRow + i, 'destroyer') : addPlacingShipClass(pointerRow + i);
                     }
                     break;
                 case 'patrolBoat':
                     for(let i = pointerCol; i < (parseInt(pointerCol) + 2); i++){
                         // $('#' + pointerRow + i).addClass('placingShip');
-                        (save) ? addSaveShipClass(pointerRow + i) : addPlacingShipClass(pointerRow + i);
+                        (save) ? addSaveClassAndCreateData(pointerRow + i, 'patrolBoat') : addPlacingShipClass(pointerRow + i);
                     }
                     break;
             }
@@ -132,25 +203,25 @@ function showShip(pointer, vertical, save) {
                 case 'aircraftCarrier':
                     shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + 5));
                     for(let i = 0; i < shipRows.length; i++){
-                        (save) ? addSaveShipClass(shipRows[i] + pointerCol) : addPlacingShipClass(shipRows[i] + pointerCol);
+                        (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, 'aircraftCarrier') : addPlacingShipClass(shipRows[i] + pointerCol);
                     }
                     break;
                 case 'battleship':
                     shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + 4));
                     for(let i = 0; i < shipRows.length; i++){
-                        (save) ? addSaveShipClass(shipRows[i] + pointerCol) : addPlacingShipClass(shipRows[i] + pointerCol);
+                        (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, 'battleship') : addPlacingShipClass(shipRows[i] + pointerCol);
                     }
                     break;
                 case 'submarine':
                     shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + 3));
                     for(let i = 0; i < shipRows.length; i++){
-                        (save) ? addSaveShipClass(shipRows[i] + pointerCol) : addPlacingShipClass(shipRows[i] + pointerCol);
+                        (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, 'submarine') : addPlacingShipClass(shipRows[i] + pointerCol);
                     }
                     break;
                 case 'destroyer':
                     shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + 3));
                     for(let i = 0; i < shipRows.length; i++){
-                        (save) ? addSaveShipClass(shipRows[i] + pointerCol) : addPlacingShipClass(shipRows[i] + pointerCol);
+                        (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, 'destroyer') : addPlacingShipClass(shipRows[i] + pointerCol);
                     }
                     break;
                 case 'patrolBoat':
@@ -158,46 +229,57 @@ function showShip(pointer, vertical, save) {
                     for(let i = 0; i < shipRows.length; i++){
                         // $('#' + shipRows[i] + pointerCol).addClass('placingShip');
                         // console.log(shipRows[i] + pointerCol);
-                        (save) ? addSaveShipClass(shipRows[i] + pointerCol) : addPlacingShipClass(shipRows[i] + pointerCol);
+                        (save) ? addSaveClassAndCreateData(shipRows[i] + pointerCol, 'patrolBoat') : addPlacingShipClass(shipRows[i] + pointerCol);
                     }
                     break;
             }
             break;
     }
-
+    */
 }
 
 function addPlacingShipClass(id) {
     $('#' + id).addClass('placingShip');
 }
 
+function addNotAllowedClass(id) {
+    $('#' + id).addClass('notAllowed');
+}
+
 function addPlacingShipShadowClass(id) {
     $('#' + id).addClass('placingShipShadow');
 }
 
-function addSaveShipClass(id) {
-    $('#' + id).addClass('saveShip');
+function addSaveClassAndCreateData(id, shipType) {
+    $('#' + id).addClass('savedShip')
+                .data("info", {"shipType": shipType,
+                                "location": id});
 }
 
-/* Drag and drop handling */
+function isPositionAllowed(relevantPointer, orientation, shipType) {
 
-function drag(ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
+    let shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
+
+    switch (orientation) {
+        case 'horizontal':
+            return (parseInt(relevantPointer) + shipDO[shipType] <= 11);
+        case 'portrait':
+            let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']; // to nie powinno tu byc deklarowane!!!!!!!!!!!!
+            let verticalAllowed = vertical.slice(1, (vertical.length - shipDO[shipType] + 1));
+            return (verticalAllowed.includes(relevantPointer));
+    }
 }
 
-function drop(ev) {
-    ev.preventDefault();
-    let data = ev.dataTransfer.getData("text");
-    ev.target.appendChild(document.getElementById(data));
-}
+// nie korzystam, bo jednak do save mam tą samą funkcje
 
-function allowDrop(ev) {
-    ev.preventDefault();
-}
-
-
-
-
-
-
-
+// function savePosition(id, orientation, shipType){
+//
+//     let shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
+//
+//     switch (orientation) {
+//         case 'horizontal':
+//             return (parseInt(col) + shipDO[shipType] <= 11) ? true : false;
+//         case 'portrait':
+//
+//     }
+// }

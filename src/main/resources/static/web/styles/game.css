@@ -80,6 +80,10 @@ table {
     font-weight: bold;
 }
 
+.through {
+    text-decoration: line-through;
+}
+
 /* SHIPS */
 #aircraftCarrierMark {
     width: 40px;
@@ -142,10 +146,14 @@ table {
     background-color: green;
 }
 
+.notAllowed {
+    background-color: red;
+}
+
 .placingShipShadow {
     background-color: darkgrey;
 }
 
-.saveShip {
+.savedShip {
     background-color: darkorange;
 }
