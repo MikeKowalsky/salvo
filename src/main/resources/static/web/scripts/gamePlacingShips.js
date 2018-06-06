@@ -143,7 +143,7 @@ function showOrSaveShip(pointer, vertical, save) {
     // if (alreadyTakenIDs === undefined || ){
     // }
 
-    // let currentShip = [];
+    let currentShip = [];
     let currentShipType = whichShipIsOn();
     let currentOrient = whatOrientation();
     let pointerRow = pointer.charAt(0);
@@ -156,20 +156,20 @@ function showOrSaveShip(pointer, vertical, save) {
     switch (currentOrient) {
         case 'horizontal':
             for(let i = pointerCol; i < (pointerCol + shipDO[currentShipType]); i++){
-                // currentShip.push(pointerRow + i);
-                if(!isPositionAllowed(pointerCol, 'horizontal', currentShipType, vertical, shipDO)){
-                    addNotAllowedClass(pointerRow + i);
-                } else {
-                    (save) ? addSaveClassAndCreateData(pointerRow + i, currentShipType) : addPlacingShipClass(pointerRow + i);
-                }
+                currentShip.push(pointerRow + i);
+                // if(!isPositionAllowed(pointerCol, 'horizontal', currentShipType, vertical, shipDO)){
+                //     addNotAllowedClass(pointerRow + i);
+                // } else {
+                //     (save) ? addSaveClassAndCreateData(pointerRow + i, currentShipType) : addPlacingShipClass(pointerRow + i);
+                // }
             }
-            // currentShip.forEach(id => {
-            //     if(!isPositionAllowed(id, 'horizontal', currentShipType, vertical, shipDO)){
-            //         addNotAllowedClass(id);
-            //     } else {
-            //         (save) ? addSaveClassAndCreateData(id, currentShipType) : addPlacingShipClass(id);
-            //     }
-            // });
+            currentShip.forEach(id => {
+                if(!isPositionAllowed(id, 'horizontal', currentShipType, vertical, shipDO)){
+                    addNotAllowedClass(id);
+                } else {
+                    (save) ? addSaveClassAndCreateData(id, currentShipType) : addPlacingShipClass(id);
+                }
+            });
 
             break;
         case 'portrait':
@@ -234,22 +234,22 @@ function addSaveClassAndCreateData(id, shipType) {
                                 "location": id});
 }
 
-// function isPositionAllowed(id, orientation, shipType, vertical, shipDO) {
-//     switch (orientation) {
-//         case 'horizontal':
-//             return (makeColFromID(id) + shipDO[shipType] <= 11);
-//         case 'portrait':
-//             let verticalAllowed = vertical.slice(1, (vertical.length - shipDO[shipType] + 1));
-//             return (verticalAllowed.includes(id.charAt(0)));
-//     }
-// }
-
-function isPositionAllowed(relevantPointer, orientation, shipType, vertical, shipDO) {
+function isPositionAllowed(id, orientation, shipType, vertical, shipDO) {
     switch (orientation) {
         case 'horizontal':
-            return (relevantPointer + shipDO[shipType] <= 11);
+            return (makeColFromID(id) + shipDO[shipType] <= 11);
         case 'portrait':
             let verticalAllowed = vertical.slice(1, (vertical.length - shipDO[shipType] + 1));
-            return (verticalAllowed.includes(relevantPointer));
+            return (verticalAllowed.includes(id.charAt(0)));
     }
 }
+
+// function isPositionAllowed(relevantPointer, orientation, shipType, vertical, shipDO) {
+//     switch (orientation) {
+//         case 'horizontal':
+//             return (relevantPointer + shipDO[shipType] <= 11);
+//         case 'portrait':
+//             let verticalAllowed = vertical.slice(1, (vertical.length - shipDO[shipType] + 1));
+//             return (verticalAllowed.includes(relevantPointer));
+//     }
+// }
