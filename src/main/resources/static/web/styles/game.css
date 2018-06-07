@@ -154,6 +154,10 @@ table {
     background-color: darkgrey;
 }
 
+.notAllowedShadow {
+    background-color: indianred;
+}
+
 .savedShip {
     background-color: darkorange;
 }
