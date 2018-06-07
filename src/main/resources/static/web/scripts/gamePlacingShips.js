@@ -34,33 +34,42 @@ function buildGridIdsArray(vertical){
 
 function handleOnMouseOver(IDs, vertical) {
 
-    let currentShip = [];
+    let currentData = [];
 
-    $('#grid *').on("mouseenter", function (e) {
+    $('#grid *').on("mouseover", function (e) {
+
+        e.stopPropagation();
+
         if (IDs.includes(e.target.id)) {
             $('#grid *').removeClass('placingShip');
             $('#grid *').removeClass('notAllowed');
             $('#grid *').removeClass('placingShipShadow');
             $('#grid *').removeClass('notAllowedShadow');
             // console.log(e.target.id);
-            currentShip = showOrSaveShip(e.target.id, IDs, vertical, false);
+            currentData = showOrSaveShip(e.target.id, IDs, vertical, false);
+            console.log(currentData);
+            handleOnClick(buildGridIdsArray(vertical), vertical, currentData);
         }
     });
 
-    handleOnClick(buildGridIdsArray(vertical), vertical, currentShip);
+    // console.log(currentData)
+    // handleOnClick(buildGridIdsArray(vertical), vertical, currentData);
 }
 
-function handleOnClick(IDs, vertical, currentShip) {
+function handleOnClick(IDs, vertical, currentData) {
 
-    $('#grid *').on("click", function (e) {
+    $('#grid *').click(function (e) {
+
+        e.stopPropagation();
 
         if (IDs.includes(e.target.id)) {
             console.log(e.target.id);
-            showOrSaveShip(e.target.id, IDs, vertical, true);
+            console.log(currentData);
+            addSaveClassAndCreateData(currentData[0], currentData[1])
 
             // break if clicked - Save - but ship is in not allowed position
-            console.log("nA: " + $('.notAllowed').length);
-            console.log("nAS: " + $('.notAllowedShadow').length);
+            // console.log("nA: " + $('.notAllowed').length);
+            // console.log("nAS: " + $('.notAllowedShadow').length);
             if ($('.notAllowed').length > 0 || $('.notAllowedShadow').length > 0) {
                 return null;
             }
@@ -88,6 +97,46 @@ function handleOnClick(IDs, vertical, currentShip) {
         });
     });
 }
+
+
+// function handleOnClick(IDs, vertical, currentData) {
+//
+//     $('#grid *').on("click", function (e) {
+//
+//         if (IDs.includes(e.target.id)) {
+//             console.log(e.target.id);
+//             showOrSaveShip(e.target.id, IDs, vertical, true);
+//
+//             // break if clicked - Save - but ship is in not allowed position
+//             console.log("nA: " + $('.notAllowed').length);
+//             console.log("nAS: " + $('.notAllowedShadow').length);
+//             if ($('.notAllowed').length > 0 || $('.notAllowedShadow').length > 0) {
+//                 return null;
+//             }
+//
+//             //deactivate 'this' shipRadioButton
+//             $("input[name='shipType']").each(function(){
+//                 if (this.checked === true){
+//                     // console.log(this.id);
+//                     this.checked = false;
+//                     this.disabled = true;
+//                     $("label[for='" + this.id + "']").addClass('through');
+//                 }
+//             });
+//         }
+//
+//         //save, when all are located, ships position in Data Object
+//         let placedShipsCounter = 0;
+//         $("input[name='shipType']").each(function(){
+//             if(this.disabled === true){
+//                 placedShipsCounter++;
+//                 if(placedShipsCounter === 5){
+//                     makeSavedShipsObject();
+//                 }
+//             }
+//         });
+//     });
+// }
 
 function makeSavedShipsObject() {
 
@@ -206,9 +255,13 @@ function showOrSaveShip(pointer, gridIDs, vertical, save) {
         addNotAllowedShadowClass(currentShadow);
     }
 
-    return currentShip;
+    let currentData = [currentShip, currentShipType];
+    // console.log(currentData);
+    return currentData;
 
 }
+
+
 
 function makeColFromID(id){
     return parseInt((id.charAt(2) === '0') ? '10' : id.charAt(1));
@@ -273,6 +326,8 @@ function addNotAllowedShadowClass(currentShadow){
 function addSaveClassAndCreateData(currentShip, shipType) {
 
     currentShip.forEach(id => {
+        console.log("addClassToID: " + id);
+
         let $elementWithID =  $('#' + id);
 
         if($elementWithID.hasClass('notAllowed')){
