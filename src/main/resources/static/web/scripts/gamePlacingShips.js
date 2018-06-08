@@ -1,28 +1,28 @@
 
-// $(document).ready(function(){
-// });
+function isShipRadioButtonClicked() {
+    let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    handleOnMouseOver(buildGridIdsArray(vertical), vertical);
+}
 
 function whichShipIsOn() {
 
     let shipButtonsIDs  = ['aircraftCarrier', 'battleship', 'submarine', 'destroyer', 'patrolBoat'];
     for(let i=0; i<shipButtonsIDs.length; i++){
         if(document.getElementById(shipButtonsIDs[i]).checked){
-            // console.log(shipButtonsIDs[i]);
             return shipButtonsIDs[i];
         }
     }
 }
 
-function isShipRadioButtonClicked() {
-
-    let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-
-    handleOnMouseOver(buildGridIdsArray(vertical), vertical);
-
+function whatOrientation() {
+    if(document.getElementById('portrait').checked){
+        return 'portrait';
+    } else {
+        return 'horizontal';
+    }
 }
 
 function buildGridIdsArray(vertical){
-
     let gridElementsArray = [];
     for(let i = 1; i < 11; i++){
         for(let j = 1; j < 11; j++){
@@ -33,11 +33,11 @@ function buildGridIdsArray(vertical){
 }
 
 function handleOnMouseOver(IDs, vertical) {
-
     let currentData = [];
 
-    $('#grid *').on("mouseover", function (e) {
+    $('#grid').on("mouseover", function (e) {
 
+        $('#grid').off("click");
         e.stopPropagation();
 
         if (IDs.includes(e.target.id)) {
@@ -47,29 +47,24 @@ function handleOnMouseOver(IDs, vertical) {
             $('#grid *').removeClass('notAllowedShadow');
             // console.log(e.target.id);
             currentData = showOrSaveShip(e.target.id, IDs, vertical, false);
-            console.log(currentData);
+            // console.log(currentData);
             handleOnClick(buildGridIdsArray(vertical), vertical, currentData);
         }
     });
-
-    // console.log(currentData)
-    // handleOnClick(buildGridIdsArray(vertical), vertical, currentData);
 }
 
 function handleOnClick(IDs, vertical, currentData) {
 
-    $('#grid *').click(function (e) {
+    $('#grid').on("click", function (e) {
 
         e.stopPropagation();
 
         if (IDs.includes(e.target.id)) {
-            console.log(e.target.id);
+            // console.log(e.target.id);
             console.log(currentData);
-            addSaveClassAndCreateData(currentData[0], currentData[1])
+            addSaveClassAndCreateData(currentData[0], currentData[1]);
 
             // break if clicked - Save - but ship is in not allowed position
-            // console.log("nA: " + $('.notAllowed').length);
-            // console.log("nAS: " + $('.notAllowedShadow').length);
             if ($('.notAllowed').length > 0 || $('.notAllowedShadow').length > 0) {
                 return null;
             }
@@ -98,50 +93,7 @@ function handleOnClick(IDs, vertical, currentData) {
     });
 }
 
-
-// function handleOnClick(IDs, vertical, currentData) {
-//
-//     $('#grid *').on("click", function (e) {
-//
-//         if (IDs.includes(e.target.id)) {
-//             console.log(e.target.id);
-//             showOrSaveShip(e.target.id, IDs, vertical, true);
-//
-//             // break if clicked - Save - but ship is in not allowed position
-//             console.log("nA: " + $('.notAllowed').length);
-//             console.log("nAS: " + $('.notAllowedShadow').length);
-//             if ($('.notAllowed').length > 0 || $('.notAllowedShadow').length > 0) {
-//                 return null;
-//             }
-//
-//             //deactivate 'this' shipRadioButton
-//             $("input[name='shipType']").each(function(){
-//                 if (this.checked === true){
-//                     // console.log(this.id);
-//                     this.checked = false;
-//                     this.disabled = true;
-//                     $("label[for='" + this.id + "']").addClass('through');
-//                 }
-//             });
-//         }
-//
-//         //save, when all are located, ships position in Data Object
-//         let placedShipsCounter = 0;
-//         $("input[name='shipType']").each(function(){
-//             if(this.disabled === true){
-//                 placedShipsCounter++;
-//                 if(placedShipsCounter === 5){
-//                     makeSavedShipsObject();
-//                 }
-//             }
-//         });
-//     });
-// }
-
 function makeSavedShipsObject() {
-
-    // console.log('in');
-
     let savedShipsObject = {"aircraftCarrier": [],
         "battleship": [],
         "submarine": [],
@@ -157,7 +109,7 @@ function makeSavedShipsObject() {
             }
         });
     }
-    // console.log(savedShipsObject);
+    console.log(savedShipsObject);
 }
 
 function makeReceivedDataArray(){
@@ -169,16 +121,6 @@ function makeReceivedDataArray(){
     });
     // console.log(receivedDataArray);
     return receivedDataArray;
-}
-
-function whatOrientation() {
-    if(document.getElementById('portrait').checked){
-        // console.log("portrait");
-        return 'portrait';
-    } else {
-        // console.log("horizontal");
-        return 'horizontal';
-    }
 }
 
 function showOrSaveShip(pointer, gridIDs, vertical, save) {
@@ -247,8 +189,6 @@ function showOrSaveShip(pointer, gridIDs, vertical, save) {
             }
             break;
     }
-    // console.log(currentShip);
-    // console.log(currentShadow);
 
     if(isSavedAndShadow(currentShadow)){
         addNotAllowedClass(currentShip);
@@ -258,10 +198,7 @@ function showOrSaveShip(pointer, gridIDs, vertical, save) {
     let currentData = [currentShip, currentShipType];
     // console.log(currentData);
     return currentData;
-
 }
-
-
 
 function makeColFromID(id){
     return parseInt((id.charAt(2) === '0') ? '10' : id.charAt(1));
@@ -291,14 +228,6 @@ function addNotAllowedClass(currentShip) {
     });
 }
 
-// function addPlacingShipClass(currentShip) {
-//     currentShip.forEach(id => $('#' + id).addClass('placingShip'));
-// }
-
-// function addNotAllowedClass(currentShip) {
-//     currentShip.forEach(id => $('#' + id).addClass('notAllowed'));
-// }
-
 function addPlacingShipShadowClass(id) {
     let $elementWithID =  $('#' + id);
     if ($elementWithID.hasClass('placingShip') ||
@@ -320,28 +249,23 @@ function addNotAllowedShadowClass(currentShadow){
             $elementWithID.addClass('notAllowedShadow');
         }
     });
-
 }
 
 function addSaveClassAndCreateData(currentShip, shipType) {
 
     currentShip.forEach(id => {
-        console.log("addClassToID: " + id);
-
         let $elementWithID =  $('#' + id);
-
         if($elementWithID.hasClass('notAllowed')){
             return null;
         }
 
         $elementWithID.addClass('savedShip')
             .data("info", {"shipType": shipType,
-                "location": id})
+                "location": id});
     });
 }
 
 function isSavedAndShadow(currentShadow) {
-
     let counter = 0;
     let alreadyTakenIDs = makeAlreadyTakenIDs();
     alreadyTakenIDs.forEach(id => {
