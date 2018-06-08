@@ -39,12 +39,9 @@ function handleOnMouseOver(IDs, vertical) {
 
         $('#grid').off("click");
         e.stopPropagation();
+        removePastClasses();
 
         if (IDs.includes(e.target.id)) {
-            $('#grid *').removeClass('placingShip');
-            $('#grid *').removeClass('notAllowed');
-            $('#grid *').removeClass('placingShipShadow');
-            $('#grid *').removeClass('notAllowedShadow');
             // console.log(e.target.id);
             currentData = showOrSaveShip(e.target.id, IDs, vertical, false);
             // console.log(currentData);
@@ -60,14 +57,16 @@ function handleOnClick(IDs, vertical, currentData) {
         e.stopPropagation();
 
         if (IDs.includes(e.target.id)) {
-            // console.log(e.target.id);
-            console.log(currentData);
-            addSaveClassAndCreateData(currentData[0], currentData[1]);
 
             // break if clicked - Save - but ship is in not allowed position
             if ($('.notAllowed').length > 0 || $('.notAllowedShadow').length > 0) {
                 return null;
             }
+
+            console.log(e.target.id);
+            console.log(currentData);
+
+            addSaveClassAndCreateData(currentData[0], currentData[1]);
 
             //deactivate 'this' shipRadioButton
             $("input[name='shipType']").each(function(){
@@ -78,19 +77,56 @@ function handleOnClick(IDs, vertical, currentData) {
                     $("label[for='" + this.id + "']").addClass('through');
                 }
             });
-        }
 
-        //save, when all are located, ships position in Data Object
-        let placedShipsCounter = 0;
-        $("input[name='shipType']").each(function(){
-            if(this.disabled === true){
-                placedShipsCounter++;
-                if(placedShipsCounter === 5){
-                    makeSavedShipsObject();
+            //save, when all are located, ships position in Data Object
+            let placedShipsCounter = 0;
+            let placedShips = null;
+
+            $("input[name='shipType']").each(function(){
+                if(this.disabled === true){
+                    placedShipsCounter++;
+                    placedShips = makeSavedShipsObject();
+                }
+            });
+
+            // activate event for dragging ship if any is located
+            if(placedShipsCounter > 0){
+                handleDraggingEventListener(placedShips);
+            }
+
+            // 5 shipsLocated so show DO
+            if(placedShipsCounter === 5){
+                console.log(placedShips);
+            }
+        }
+    });
+}
+
+function handleDraggingEventListener(placedShips) {
+
+    $('#grid').on("click", function (e) {
+
+        e.stopPropagation();
+        let $idToDrag = $('#' + e.target.id);
+
+        if ($idToDrag.hasClass('savedShip')){
+            for(let key in placedShips){
+                if (key === $idToDrag.data("info").shipType){
+                    console.log("chosen-to-drag Ship location: " + key + " / " + placedShips[key]);
+
+                    // remove savedShipClass
+                    placedShips[key].forEach(id => {
+                        $('#' + id).removeClass('savedShip');
+                    });
+
+                    //activate radio button again
+                    $('#' + key).removeAttr('disabled').prop("checked", true);
+                    $("label[for='" + key + "']").removeClass('through');
                 }
             }
-        });
+        }
     });
+
 }
 
 function makeSavedShipsObject() {
@@ -109,7 +145,8 @@ function makeSavedShipsObject() {
             }
         });
     }
-    console.log(savedShipsObject);
+    // console.log(savedShipsObject);
+    return savedShipsObject;
 }
 
 function makeReceivedDataArray(){
@@ -123,10 +160,8 @@ function makeReceivedDataArray(){
     return receivedDataArray;
 }
 
-function showOrSaveShip(pointer, gridIDs, vertical, save) {
+function showOrSaveShip(pointer, gridIDs, vertical) {
 
-    let currentShip = [];
-    let currentShadow = [];
     let currentShipType = whichShipIsOn();
     let currentOrient = whatOrientation();
     let pointerRow = pointer.charAt(0);
@@ -136,59 +171,48 @@ function showOrSaveShip(pointer, gridIDs, vertical, save) {
     let shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
 
     // Ship
-    switch (currentOrient) {
-        case 'horizontal':
-            for(let i = pointerCol; i < (pointerCol + shipDO[currentShipType]); i++) {
-                if (i > 0 && i <11) {
-                    currentShip.push(pointerRow + i);
-                }
+    let currentShip = [];
+    if (currentOrient === 'horizontal') {
+        for(let i = pointerCol; i < (pointerCol + shipDO[currentShipType]); i++) {
+            if (i > 0 && i <11) {
+                currentShip.push(pointerRow + i);
             }
-            // console.log(currentShip);
-            currentShip.forEach(id => {
-                if((!gridIDs.includes(id)) || currentShip.length !== shipDO[currentShipType]){
-                    addNotAllowedClass(currentShip);
-                } else {
-                    (save) ? addSaveClassAndCreateData(currentShip, currentShipType) : addPlacingShipClass(currentShip);
-                }
-            });
-            break;
-        case 'portrait':
-            let shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + shipDO[currentShipType]));
-            for(let i = 0; i < shipRows.length; i++) {
-                currentShip.push(shipRows[i] + pointerCol);
-            }
-            // console.log(currentShip);
-            currentShip.forEach(id => {
-                if ((!gridIDs.includes(id)) || currentShip.length !== shipDO[currentShipType]){
-                    addNotAllowedClass(currentShip);
-                } else {
-                    (save) ? addSaveClassAndCreateData(currentShip, currentShipType) : addPlacingShipClass(currentShip);
-                }
-            });
-            break;
+        }
+    } else {
+        let shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + shipDO[currentShipType]));
+        for(let i = 0; i < shipRows.length; i++) {
+            currentShip.push(shipRows[i] + pointerCol);
+        }
     }
 
+    currentShip.forEach(id => {
+        ((!gridIDs.includes(id)) || currentShip.length !== shipDO[currentShipType]) ?
+            addNotAllowedClass(currentShip) : addPlacingShipClass(currentShip);
+    });
+
     // Shadow
-    switch (currentOrient) {
-        case 'horizontal':
-            let shipRowsHorizontal = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + 2));
-            for(let i = (pointerCol - 1); i < (pointerCol + shipDO[currentShipType] + 1); i++){
-                for(let j = 0; j < shipRowsHorizontal.length; j++){
-                    currentShadow.push(shipRowsHorizontal[j] + i);
-                    addPlacingShipShadowClass(shipRowsHorizontal[j] + i);
-                }
+    let currentShadow = [];
+    if (currentOrient === 'horizontal'){
+        let shipRowsHorizontal = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + 2));
+        for(let i = (pointerCol - 1); i < (pointerCol + shipDO[currentShipType] + 1); i++){
+            for(let j = 0; j < shipRowsHorizontal.length; j++){
+                currentShadow.push(shipRowsHorizontal[j] + i);
             }
-            break;
-        case 'portrait':
-            let shipRows = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + shipDO[currentShipType] + 1));
-            for(let i = 0; i < shipRows.length; i++){
-                for(let j = (pointerCol - 1); j < (pointerCol + 2); j++){
-                    currentShadow.push(shipRows[i] + j);
-                    addPlacingShipShadowClass(shipRows[i] + j);
-                }
+        }
+    } else {
+        let shipRows = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + shipDO[currentShipType] + 1));
+        for(let i = 0; i < shipRows.length; i++){
+            for(let j = (pointerCol - 1); j < (pointerCol + 2); j++){
+                currentShadow.push(shipRows[i] + j);
             }
-            break;
+        }
     }
+
+    currentShadow.forEach(id => {
+        if (gridIDs.includes(id)) {
+            addPlacingShipShadowClass(id);
+        }
+    });
 
     if(isSavedAndShadow(currentShadow)){
         addNotAllowedClass(currentShip);
@@ -265,9 +289,18 @@ function addSaveClassAndCreateData(currentShip, shipType) {
     });
 }
 
+function removePastClasses(){
+    let $allGridElements = $('#grid *');
+    $allGridElements.removeClass('placingShip');
+    $allGridElements.removeClass('notAllowed');
+    $allGridElements.removeClass('placingShipShadow');
+    $allGridElements.removeClass('notAllowedShadow');
+}
+
 function isSavedAndShadow(currentShadow) {
     let counter = 0;
     let alreadyTakenIDs = makeAlreadyTakenIDs();
+
     alreadyTakenIDs.forEach(id => {
         if(currentShadow.includes(id)){
             counter++;
@@ -284,3 +317,4 @@ function makeAlreadyTakenIDs(){
     });
     return alreadyTakenIDs;
 }
+
