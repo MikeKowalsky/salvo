@@ -54,6 +54,11 @@ public class Ship {
     public String getShipType() {
         return shipType;
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + this.getId() + " / type: " + this.shipType + " / location: " + this.getLocations();
+    }
 }
 
 

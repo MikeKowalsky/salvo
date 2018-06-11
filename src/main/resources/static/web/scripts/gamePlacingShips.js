@@ -97,6 +97,8 @@ function handleOnClick(IDs, vertical, currentData) {
             // 5 shipsLocated so show DO
             if(placedShipsCounter === 5){
                 console.log(placedShips);
+                $('#savePositions').data('dataToSend', placedShips);
+                $('#savePositionsDiv').show();
             }
         }
     });
@@ -110,43 +112,47 @@ function handleDraggingEventListener(placedShips) {
         let $idToDrag = $('#' + e.target.id);
 
         if ($idToDrag.hasClass('savedShip')){
-            for(let key in placedShips){
-                if (key === $idToDrag.data("info").shipType){
-                    console.log("chosen-to-drag Ship location: " + key + " / " + placedShips[key]);
+            placedShips.forEach((placedShip) => {
+                if(placedShip.shipType === $idToDrag.data("info").shipType){
+                    console.log("chosen-to-drag Ship location: " + placedShip.shipType + " / " + placedShip.locations);
 
                     // remove savedShipClass
-                    placedShips[key].forEach(id => {
-                        $('#' + id).removeClass('savedShip');
+                    placedShip.locations.forEach(id => {
+                        $('#' + id).removeClass('savedShip').empty();
                     });
 
                     //activate radio button again
-                    $('#' + key).removeAttr('disabled').prop("checked", true);
-                    $("label[for='" + key + "']").removeClass('through');
+                    console.log(placedShip.shipType);
+                    $('#' + placedShip.shipType).removeAttr('disabled').prop("checked", true);
+                    $("label[for='" + placedShip.shipType + "']").removeClass('through');
                 }
-            }
+            });
         }
     });
-
 }
 
 function makeSavedShipsObject() {
-    let savedShipsObject = {"aircraftCarrier": [],
-        "battleship": [],
-        "submarine": [],
-        "destroyer": [],
-        "patrolBoat": []};
+    let savedShipsArray = [{shipType: "aircraftCarrier", locations: []},
+        {shipType: "battleship", locations: []},
+        {shipType: "submarine", locations: []},
+        {shipType: "destroyer", locations: []},
+        {shipType: "patrolBoat", locations: []}];
+
+
+    // [ { type: "destroyer", locations: ["E1", "F1", "G1"] },
+    // { type: "patrol boat", locations: ["I5", "I6"] }])
 
     let receivedDataArray = makeReceivedDataArray();
 
-    for(let key in savedShipsObject){
+    savedShipsArray.forEach((shipType) => {
         receivedDataArray.forEach(gridLocation => {
-            if(key == gridLocation.shipType){
-                savedShipsObject[key].push(gridLocation.location);
+            if(shipType.shipType === gridLocation.shipType){
+                shipType.locations.push(gridLocation.locations);
             }
         });
-    }
-    // console.log(savedShipsObject);
-    return savedShipsObject;
+    });
+    // console.log(savedShipsArray);
+    return savedShipsArray;
 }
 
 function makeReceivedDataArray(){
@@ -283,9 +289,11 @@ function addSaveClassAndCreateData(currentShip, shipType) {
             return null;
         }
 
+        $elementWithID
         $elementWithID.addClass('savedShip')
-            .data("info", {"shipType": shipType,
-                "location": id});
+                        .data("info", {"shipType": shipType,
+                                        "locations": id})
+                        .append(giveShipTypeShortcut(shipType));
     });
 }
 
@@ -316,5 +324,17 @@ function makeAlreadyTakenIDs(){
         alreadyTakenIDs.push(this.id);
     });
     return alreadyTakenIDs;
+}
+
+function giveShipTypeShortcut(shipType) {
+
+    switch (shipType) {
+        case 'aircraftCarrier' : return 'AC';
+        case 'battleship' : return 'BS';
+        case 'submarine' : return 'SM';
+        case 'destroyer' : return 'DE';
+        case 'patrolBoat' : return 'PB';
+    }
+
 }
 

@@ -76,6 +76,10 @@ table {
     font-weight: bold;
 }
 
+#doubleClickInfo{
+    font-style: italic;
+}
+
 .bold {
     font-weight: bold;
 }

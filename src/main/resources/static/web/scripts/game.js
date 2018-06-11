@@ -2,6 +2,7 @@
 $(document).ready(function(){
 
     $('#errorDiv').hide();
+    $('#savePositionsDiv').hide();
 
     let gamePlayerId = GetQueryString();
     console.log(gamePlayerId);
@@ -53,6 +54,12 @@ function printGamePage(data, gpId){
     let enemyId = getEnemyId(data,gpId);
 
     header(data, gpId);
+    activateSendShipLocationsButton();
+
+    if(data.ships.length > 0){
+        hidePlacingShipsDivs();
+    }
+
     printGrid('#grid');
     if (enemyExist(data)){
         printGrid('#salvoGrid');
@@ -85,8 +92,8 @@ function getPlayerId(data, gpId) {
 }
 
 function enemyExist(data) {
-    console.log((data.gamePlayers.length == 2) ? true : false);
-    return (data.gamePlayers.length == 2) ? true : false;
+    // console.log((data.gamePlayers.length == 2) ? true : false);
+    return (data.gamePlayers.length > 1);
 }
 
 function getEnemyId(data, gpId) {
@@ -118,6 +125,35 @@ function header(dataFromAjaxCall, gamePlayerId) {
 
 }
 
+function activateSendShipLocationsButton(){
+    $('#savePositions').on("click", function (e){
+
+        e.preventDefault();
+        let gpID = GetQueryString();
+        let url = "/api/games/players/" + gpID.gp + "/ships";
+        let receivedDataToSend = $('#savePositions').data('dataToSend');
+        console.log(receivedDataToSend);
+
+        $.post({
+            url: url,
+            data: JSON.stringify(receivedDataToSend),
+            dataType: "text",
+            contentType: "application/json"
+        })
+            .done(function(resp) {
+                // console.log("ship added");
+                // console.log(resp);
+                window.location = "/web/game.html?gp=" + gpID.gp;
+
+            })
+            .fail(function(resp){
+                console.log(resp);
+                alert('Something went wrong!');
+            });
+    });
+
+}
+
 function printGrid(elementID) {
 
     let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -142,31 +178,6 @@ function printGrid(elementID) {
     }
 }
 
-function ship_test(){
-
-    let gpID = GetQueryString();
-    let url = "/api/games/players/" + gpID.gp + "/ships";
-
-    $.post({
-        url: url,
-        data: JSON.stringify([ { type: "destroyer", locations: ["E1", "F1", "G1"] },
-            { type: "patrol boat", locations: ["I5", "I6"] }
-        ]),
-        dataType: "text",
-        contentType: "application/json"
-        })
-        .done(function(resp) {
-            console.log("ship added");
-            console.log(resp);
-            window.location = "/web/game.html?gp=" + gpID.gp;
-
-        })
-        .fail(function(resp){
-            console.log(resp);
-            alert('Something went wrong!');
-        });
-}
-
 function markGrids(dataFromAjaxCall, gamePlayerId) {
     if (gamePlayerId == dataFromAjaxCall.gamePlayers[0].id){
         $('#gridOne').append('<p>' + dataFromAjaxCall.gamePlayers[0].player.email + '(you)</p>').addClass('bold');
@@ -183,12 +194,14 @@ function markShips(data) {
 
     let shipsLocations = [];
     data.ships.forEach((ship) => {
-        ship.locations.forEach((location) => shipsLocations.push(location));
+        ship.locations.forEach((location) => {
+            $('#' + location).addClass('playersShip')
+                .append(giveShipTypeShortcut(ship.shipType));
+            shipsLocations.push(location);
+        });
     });
-    console.log('shipsLocations: ' + shipsLocations);
 
-    shipsLocations.forEach((location) => $('#' + location).addClass('playersShip'));
-
+    // console.log('shipsLocations: ' + shipsLocations);
     return shipsLocations;
 }
 
@@ -201,8 +214,7 @@ function markSalvos(data, pID, playerType, shipsLocations) {
             salvo.locations.forEach((location) => salvoLocations[salvo.turnNo].push(location));
         }
     });
-    console.log(playerType);
-    console.log(salvoLocations);
+    console.log("salvos: " + playerType + " / " + JSON.stringify(salvoLocations));
 
     for (let key in salvoLocations){
         salvoLocations[key].forEach((location) => {
@@ -218,6 +230,13 @@ function markSalvos(data, pID, playerType, shipsLocations) {
             }
         });
     }
+}
+
+function hidePlacingShipsDivs(){
+    $('#savePositionsDiv').hide();
+    $('#shipChoose').hide();
+    $('#orientationChoose').hide();
+    $('#doubleClickInfo').hide();
 }
 
 

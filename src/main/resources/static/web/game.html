@@ -24,32 +24,28 @@
         <a href="/web/games.html">Back to game list</a>
     </div>
 
-    <div id="ship_test">
-        <button onclick="ship_test()">Test</button>
-    </div>
-
     <div id="gameNo"></div>
 
-    <br><br>
+
     <div id="shipChoose">
+        <br><br>
         <input type="radio" name="shipType" id="aircraftCarrier" onclick="isShipRadioButtonClicked()">
-        <label for="aircraftCarrier">Aircraft Carrier (size: 5)</label><br>
+        <label for="aircraftCarrier">Aircraft Carrier - AC - (size: 5)</label><br>
         <br>
         <input type="radio" name="shipType" id="battleship" onclick="isShipRadioButtonClicked()">
-        <label for="battleship">Battleship (size: 4)</label><br>
+        <label for="battleship">Battleship - BS - (size: 4)</label><br>
         <br>
         <input type="radio" name="shipType" id="submarine" onclick="isShipRadioButtonClicked()">
-        <label for="submarine">Submarine (size: 3)</label><br>
+        <label for="submarine">Submarine - SM - (size: 3)</label><br>
         <br>
         <input type="radio" name="shipType" id="destroyer" onclick="isShipRadioButtonClicked()">
-        <label for="destroyer">Destroyer (size: 3)</label><br>
+        <label for="destroyer">Destroyer - DE - (size: 3)</label><br>
         <br>
         <input type="radio" name="shipType" id="patrolBoat" onclick="isShipRadioButtonClicked()">
-        <label for="patrolBoat">Patrol Boat (size: 2)</label><br>
+        <label for="patrolBoat">Patrol Boat - PB - (size: 2)</label><br>
         <br>
     </div>
 
-    <br><br>
     <div id="orientationChoose">
         <input type="radio" name="orientation" id="horizontal" checked>
         <label for="horizontal">Horizontal</label><br>
@@ -57,11 +53,11 @@
         <label for="portrait">Portrait</label><br>
     </div>
 
-    <br>
     <div id="twoGrids">
+        <br>
         <div>
             <div id="gridOne"></div>
-            <!--<div id="grid"></div>-->
+            <div id="doubleClickInfo">* To drag placed ship use double click!</div>
             <div id="grid"></div>
         </div>
         <div id="playerTwo">
@@ -69,6 +65,11 @@
             <div id="salvoGrid"></div>
         </div>
 
+    </div>
+
+    <div id="savePositionsDiv">
+        <br>
+        <input id="savePositions" type="button" value="Save ships positions">
     </div>
 </div>
 
