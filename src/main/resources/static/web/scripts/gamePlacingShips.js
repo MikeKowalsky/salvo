@@ -1,7 +1,7 @@
 
 function isShipRadioButtonClicked() {
     let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-    handleOnMouseOver(buildGridIdsArray(vertical), vertical);
+    handleOnMouseOver(buildGridIdsArray(vertical, 'forShips'), vertical);
 }
 
 function whichShipIsOn() {
@@ -22,11 +22,12 @@ function whatOrientation() {
     }
 }
 
-function buildGridIdsArray(vertical){
+function buildGridIdsArray(vertical, gridType){
     let gridElementsArray = [];
     for(let i = 1; i < 11; i++){
         for(let j = 1; j < 11; j++){
-            gridElementsArray.push(vertical[i] + j);
+            (gridType === 'forShips') ?
+                gridElementsArray.push(vertical[i] + j) : gridElementsArray.push('s' + vertical[i] + j) ;
         }
     }
     return gridElementsArray;

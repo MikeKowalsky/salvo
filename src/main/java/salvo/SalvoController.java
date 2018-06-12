@@ -30,6 +30,9 @@ public class SalvoController {
     @Autowired
     ShipRepository shipRepo;
 
+    @Autowired
+    SalvoRepository salvoRepo;
+
     private Map<String, Object> MakePlayerDTO(Player player){
         Map<String, Object> playerDTO = new LinkedHashMap<String, Object>();
         playerDTO.put("id", player.getId());
@@ -209,7 +212,6 @@ public class SalvoController {
         } else {
             throw new NoLoggedInUser("Log in first");
         }
-
 //        return gameWithUserMap;
     }
 
@@ -247,6 +249,28 @@ public class SalvoController {
         return (gamePlayerRepo.findOne(gamePlayerId).getShips().size() > 0);
     }
 
+    private Long whichTurnIsIt(GamePlayer gamePlayer){
+        Comparator<Long> comparator = Comparator.comparing(Long::intValue);
+
+        Long turnNo = new Long(1);
+
+        if (gamePlayer.getSalvos().size() > 0){
+            turnNo = (gamePlayer
+                    .getSalvos()
+                    .stream()
+                    .map(salvo -> salvo.getTurnNumber())
+                    .max(comparator)
+                    .get() + 1
+            );
+        }
+        return turnNo;
+    }
+
+    private boolean isTurnCorrect(Salvo salvo, Long turnNo){
+        Long turnNoInReceivedData = salvo.getTurnNumber();
+        return turnNoInReceivedData.equals(turnNo);
+    }
+
     @RequestMapping(path = "/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createPlayer(String name, String pwd) {
 //        if (username.isEmpty()) {
@@ -262,6 +286,7 @@ public class SalvoController {
         return new ResponseEntity<>(makeMap("Username", newPlayer.getUserName()), HttpStatus.CREATED);
     }
 
+
     @RequestMapping(path = "/games", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createGame(Authentication authentication){
 
@@ -276,6 +301,7 @@ public class SalvoController {
         }
 
     }
+
 
     @RequestMapping(path = "/game/{gameId}/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> joinGame(Authentication authentication, @PathVariable Long gameId){
@@ -297,6 +323,7 @@ public class SalvoController {
         GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, currentGame));
         return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
     }
+
 
     @RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addShips(Authentication authentication,
@@ -328,6 +355,39 @@ public class SalvoController {
         });
 
         return new ResponseEntity<>(makeMap("Added Ships", result), HttpStatus.CREATED);
+    }
+
+
+    @RequestMapping(path = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> addSalvos(Authentication authentication,
+                                                        @PathVariable Long gamePlayerId,
+                                                        @RequestBody Salvo newSalvo){
+
+        if (isGuest(authentication)){
+            return new ResponseEntity<>(makeMap("error", "You need to be logged in"), HttpStatus.UNAUTHORIZED);
+        }
+        if (!isGamePlayerExist(gamePlayerId)){
+            return new ResponseEntity<>(makeMap("error", "That gamePlayerId dosnt exist"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!isPlayerInThisGame(authentication, gamePlayerId)){
+            return new ResponseEntity<>(makeMap("error", "This Player is not in this game"), HttpStatus.UNAUTHORIZED);
+        }
+
+        GamePlayer currentGamePlayer = gamePlayerRepo.findOne(gamePlayerId);
+        Long turnNo = whichTurnIsIt(currentGamePlayer);
+
+        if (!isTurnCorrect(newSalvo, turnNo)){
+            return new ResponseEntity<>(makeMap("error", "Salvos are already located in this turn"), HttpStatus.FORBIDDEN);
+        }
+
+        Map<Object,Object> result = new HashMap<>();
+
+        currentGamePlayer.addSalvo(newSalvo);
+        salvoRepo.save(newSalvo);
+        result.put(newSalvo.getId(), newSalvo.getLocations());
+
+        return new ResponseEntity<>(makeMap("Added Salvo", result), HttpStatus.CREATED);
     }
 
     private Map<String, Object> makeMap(String key, Object value) {

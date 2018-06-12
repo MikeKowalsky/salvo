@@ -26,6 +26,11 @@ public class Salvo {
         this.turnNumber = turnNumber;
     }
 
+    public Salvo(long turnNumber, List<String> locations) {
+        this.turnNumber = turnNumber;
+        this.locations = locations;
+    }
+
     public long getId() {
         return id;
     }

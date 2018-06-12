@@ -26,6 +26,9 @@
 
     <div id="gameNo"></div>
 
+    <div id="tempSalvoButto ">
+        <input id="activateSalvoePlacing" type="button" value="Activate Salvo Placing">
+    </div>
 
     <div id="shipChoose">
         <br><br>
@@ -53,16 +56,24 @@
         <label for="portrait">Portrait</label><br>
     </div>
 
+    <div id="doubleClickInfo"><br>* To drag placed ship use double click!</div>
+
     <div id="twoGrids">
         <br>
         <div>
             <div id="gridOne"></div>
-            <div id="doubleClickInfo">* To drag placed ship use double click!</div>
             <div id="grid"></div>
         </div>
         <div id="playerTwo">
             <div id="gridTwo"></div>
             <div id="salvoGrid"></div>
+            <div id="locationArray">
+                <br>
+            </div>
+            <div id="saveLocationDiv">
+                <br>
+                <input id="saveLocationButton" type="button" value="Save salvoes locations">
+            </div>
         </div>
 
     </div>
@@ -80,6 +91,7 @@
 </script>
 <script src="/web/scripts/game.js"></script>
 <script src="/web/scripts/gamePlacingShips.js"></script>
+<script src="/web/scripts/gamePlacingSalvoes.js"></script>
 
 </body>
 </html>

@@ -67,6 +67,11 @@ function printGamePage(data, gpId){
         $('#playerTwo').hide();
     }
     markGrids(data, gpId);
+
+    // save turnNo in salvoGrid element
+    saveTurnNoInGrid(data, gpId);
+    console.log("tunrNo: " + $('#s0').data('turnNo'));
+
     let shipsLocationArray = markShips(data);
     markSalvos(data, playerId, 'owner', shipsLocationArray);
     markSalvos(data, enemyId, 'enemy', shipsLocationArray);
@@ -154,6 +159,43 @@ function activateSendShipLocationsButton(){
 
 }
 
+function showButtonAndHandleSendingSalvoesData(salvoesArray){
+
+    $('#saveLocationDiv').show();
+    $('#saveLocationButton').unbind( "click" ).on('click', function(e) {
+
+        // e.preventDefault();
+        // e.stopPropagation();
+
+        let turnNo = $('#s0').data('turnNo');
+        console.log({turnNumber: turnNo, locations: salvoesArray});
+        let dataToSend = {turnNumber: turnNo, locations: salvoesArray};
+        console.log(JSON.stringify(dataToSend));
+
+        let gpID = GetQueryString();
+        let url = "/api/games/players/" + gpID.gp + "/salvos";
+
+        $.post({
+            url: url,
+            data: JSON.stringify(dataToSend),
+            dataType: "text",
+            contentType: "application/json"
+        })
+            .done(function(resp) {
+                // console.log("salvoes added");
+                // console.log(resp);
+                window.location = "/web/game.html?gp=" + gpID.gp;
+
+            })
+            .fail(function(resp){
+                console.log(resp);
+                alert('Something went wrong!');
+            });
+
+    });
+
+}
+
 function printGrid(elementID) {
 
     let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -210,7 +252,7 @@ function markSalvos(data, pID, playerType, shipsLocations) {
     let salvoLocations = {};
     data.salvoes.forEach((salvo) => salvoLocations[salvo.turnNo] = []);
     data.salvoes.forEach((salvo) => {
-        if (pID == salvo.playerId){
+        if (pID === salvo.playerId){
             salvo.locations.forEach((location) => salvoLocations[salvo.turnNo].push(location));
         }
     });
@@ -237,6 +279,25 @@ function hidePlacingShipsDivs(){
     $('#shipChoose').hide();
     $('#orientationChoose').hide();
     $('#doubleClickInfo').hide();
+}
+
+function saveTurnNoInGrid(data, gpID) {
+
+    let turnNo = 1;
+    let turnNoArray = [];
+    let playerID = getPlayerId(data, gpID);
+
+    if (data.salvoes.length > 0){
+        data.salvoes.forEach((salvo) => {
+            if(playerID === salvo.playerId){
+                turnNoArray.push(salvo.turnNo);
+            }
+        });
+        turnNoArray.sort((a, b) => b - a);
+        turnNo = (turnNoArray[0] + 1);
+    }
+
+    $('#s0').data('turnNo', turnNo);
 }
 
 
