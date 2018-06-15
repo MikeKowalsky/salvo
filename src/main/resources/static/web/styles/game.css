@@ -187,3 +187,12 @@ table {
     border: 1px solid black;
     padding: 3px;
 }
+
+.hit{
+    background-color: orangered;
+}
+
+.sinked{
+    text-decoration: line-through;
+    background-color: darkgrey;
+}

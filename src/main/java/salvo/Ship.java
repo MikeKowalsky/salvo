@@ -16,6 +16,10 @@ public class Ship {
     @Column(name="location")
     private List<String> locations = new ArrayList<>();
 
+    @ElementCollection
+    @Column(name="hit")
+    private List<String> hits = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
@@ -53,6 +57,18 @@ public class Ship {
 
     public String getShipType() {
         return shipType;
+    }
+
+    public List<String> getHits() {
+        return hits;
+    }
+
+    public void addHits(String hit) {
+        this.getHits().add(hit);
+    }
+
+    public boolean isSink(){
+        return (this.getLocations().size() == this.getHits().size());
     }
 
     @Override

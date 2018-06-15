@@ -189,7 +189,7 @@ public class SalvoController {
                 .map(salvo -> MakeSalvoDTO(salvo))
                 .collect(Collectors.toSet());
     }
-    
+
     // hitsAndSink data for gameViewPage
     private Map<String, Object> MakeShipInfoForHits(Ship currentShip, Set<Salvo> currentSalvosFromCurrentTurn){
 
@@ -200,6 +200,7 @@ public class SalvoController {
             salvo.getLocations().forEach(singleShot -> {
                 if (currentShipLocations.contains(singleShot)){
                     hits.add(singleShot);
+                    currentShip.addHits(singleShot);
                 }
             });
         });
@@ -207,7 +208,7 @@ public class SalvoController {
         Map<String, Object> currentShipInfo = new LinkedHashMap<String, Object>();
         currentShipInfo.put("size", currentShipLocations.size());
         currentShipInfo.put("hits", hits);
-        currentShipInfo.put("isSink", (currentShipLocations.size() == hits.size()));
+        currentShipInfo.put("isSink", currentShip.isSink());
         return currentShipInfo;
     }
 
