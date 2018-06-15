@@ -177,3 +177,13 @@ table {
 .notAllowedSalvo{
     background-color: red;
 }
+
+#gameState > table > tbody > tr > th{
+    border: 1px solid black;
+    padding: 3px;
+}
+
+#gameState > table > tbody > tr > td{
+    border: 1px solid black;
+    padding: 3px;
+}

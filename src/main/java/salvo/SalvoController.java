@@ -143,7 +143,7 @@ public class SalvoController {
                 .collect(Collectors.toList());
     }
 
-
+    // ship data for gameViewPage
     private Map<String, Object> MakeShipDTO (Ship ship){
         Map<String, Object> shipDTO = new LinkedHashMap<String, Object>();
         shipDTO.put("shipType", ship.getShipType());
@@ -151,16 +151,12 @@ public class SalvoController {
         return shipDTO;
     }
 
-
+    // ship data for gameViewPage
     private Set<Object> MakeShipSetDTO (Set<Ship> ships){
         return ships
                 .stream()
                 .map(ship -> MakeShipDTO(ship))
                 .collect(Collectors.toSet());
-    }
-
-    public Set<Salvo> GetEnemySalvoSet (GamePlayer gamePlayer){
-        return gamePlayer.getSalvos();
     }
 
     public GamePlayer GetEnemyGamePlayer (GamePlayer gamePlayerOwner){
@@ -172,6 +168,7 @@ public class SalvoController {
         return (enemy.isPresent()) ? enemy.get() : gamePlayerOwner;
     }
 
+    // salvo data for gameViewPage
     private Map<String, Object> MakeSalvoDTO(Salvo salvo){
         Map<String, Object> salvoDTO = new LinkedHashMap<String, Object>();
         salvoDTO.put("playerId", salvo.getGamePlayer().getPlayer().getId());
@@ -180,15 +177,81 @@ public class SalvoController {
         return salvoDTO;
     }
 
-    private Set<Object> MakeSalvoSetDTO (Set<Salvo> salvos, Set<Salvo> enemysSet){
-        salvos.addAll(enemysSet);
-        return salvos
+    // salvo data for gameViewPage
+    private Set<Object> MakeSalvoSetDTO (Set<Salvo> playersSalvosSet, Set<Salvo> enemysSalvoesSet){
+
+        Set<Salvo> doubleSalvoSet = new HashSet<Salvo>();
+        doubleSalvoSet.addAll(playersSalvosSet);
+        doubleSalvoSet.addAll(enemysSalvoesSet);
+
+        return doubleSalvoSet
                 .stream()
                 .map(salvo -> MakeSalvoDTO(salvo))
                 .collect(Collectors.toSet());
     }
+    
+    // hitsAndSink data for gameViewPage
+    private Map<String, Object> MakeShipInfoForHits(Ship currentShip, Set<Salvo> currentSalvosFromCurrentTurn){
 
+        List<String> currentShipLocations = currentShip.getLocations();
+        ArrayList<String> hits = new ArrayList<>();
 
+        currentSalvosFromCurrentTurn.forEach(salvo -> {
+            salvo.getLocations().forEach(singleShot -> {
+                if (currentShipLocations.contains(singleShot)){
+                    hits.add(singleShot);
+                }
+            });
+        });
+
+        Map<String, Object> currentShipInfo = new LinkedHashMap<String, Object>();
+        currentShipInfo.put("size", currentShipLocations.size());
+        currentShipInfo.put("hits", hits);
+        currentShipInfo.put("isSink", (currentShipLocations.size() == hits.size()));
+        return currentShipInfo;
+    }
+
+    // hitsAndSink data for gameViewPage
+    private Map<Object, Object> MakeHitsOnGivenPlayer(GamePlayer givenGP, int currentTurn){
+
+        Set<Ship> givenPlayerShips = givenGP.getShips();
+        Set<Salvo> enemySalvosFromCurrentTurn = GetEnemyGamePlayer(givenGP).getSalvos()
+                .stream()
+                .filter(salvo -> salvo.getTurnNumber() == currentTurn)
+                .collect(Collectors.toSet());
+
+        Map<Object, Object> hitsOnGivenPlayer = new LinkedHashMap<Object, Object>();
+
+        givenPlayerShips.stream().forEach((ship) -> {
+            hitsOnGivenPlayer.put(ship.getShipType(), MakeShipInfoForHits(ship, enemySalvosFromCurrentTurn));
+        });
+        return hitsOnGivenPlayer;
+    }
+
+    // hitsAndSink data for gameViewPage
+    private Map<String, Object> MakeHitsAndSinks(int currentTurn, GamePlayer gp){
+
+        Map<String, Object> hitsAndSinks = new LinkedHashMap<String, Object>();
+        hitsAndSinks.put("turnNo", currentTurn);
+        hitsAndSinks.put("hitsOnPlayer", MakeHitsOnGivenPlayer(gp, currentTurn));
+        hitsAndSinks.put("hitsOnEnemy", MakeHitsOnGivenPlayer(GetEnemyGamePlayer(gp), currentTurn));
+        return hitsAndSinks;
+    }
+
+    // hitsAndSink data for gameViewPage
+    private Set<Object> MakeHitsAndSinksSet (GamePlayer gp){
+
+         Long lastTurnNo = whichTurnIsIt(gp) - 1;
+         if (lastTurnNo == 0){ return null; }
+
+         Set<Object> hitsAndSinksSet = new HashSet<Object>();
+         for (int i = 1; i <= lastTurnNo; i++){
+             hitsAndSinksSet.add(MakeHitsAndSinks(i, gp));
+         }
+         return hitsAndSinksSet;
+    }
+
+    //main method to create JSON with all date for gameViewPage
     @RequestMapping("/game_view/{gamePlayerId}")
     public Map<String, Object> singleGameView (Authentication authentication, @PathVariable Long gamePlayerId) throws UserIsNotAuthorized, NoLoggedInUser{
 
@@ -199,7 +262,8 @@ public class SalvoController {
         gameWithUserMap.put("created", gp.getGame().getCreationDate());
         gameWithUserMap.put("gamePlayers", MakeGamePlayerSetDTO(gp.getGame().getGamePlayerSet()));
         gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
-        gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemySalvoSet(GetEnemyGamePlayer(gp))));
+        gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemyGamePlayer(gp).getSalvos()));
+        gameWithUserMap.put("hAS", MakeHitsAndSinksSet(gp));
 
         if (!isGuest(authentication)){
             Player loggedInPlayer = playerRepo.findByUserName(authentication.getName());
@@ -212,7 +276,6 @@ public class SalvoController {
         } else {
             throw new NoLoggedInUser("Log in first");
         }
-//        return gameWithUserMap;
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -395,6 +458,4 @@ public class SalvoController {
         map.put(key, value);
         return map;
     }
-
-    
 }

@@ -54,7 +54,8 @@ function printGamePage(data, gpId){
     let enemyId = getEnemyId(data,gpId);
 
     header(data, gpId);
-    activateSendShipLocationsButton();
+
+    createGameStateTable(data);
 
     if(data.ships.length > 0){
         hidePlacingShipsDivs();
@@ -67,6 +68,8 @@ function printGamePage(data, gpId){
         $('#playerTwo').hide();
     }
     markGrids(data, gpId);
+
+    activateSendShipLocationsButton();
 
     // save turnNo in salvoGrid element
     saveTurnNoInGrid(data, gpId);

@@ -38,7 +38,7 @@ function handleOnMouseOver(IDs, vertical) {
 
     $('#grid').on("mouseover", function (e) {
 
-        $('#grid').off("click");
+        $('#grid').off("click"); //sprawdzic czy mozna nie korzystac z tego jesli jest located ship
         e.stopPropagation();
         removePastClasses();
 
@@ -46,7 +46,7 @@ function handleOnMouseOver(IDs, vertical) {
             // console.log(e.target.id);
             currentData = showOrSaveShip(e.target.id, IDs, vertical, false);
             // console.log(currentData);
-            handleOnClick(buildGridIdsArray(vertical), vertical, currentData);
+            handleOnClick(IDs, vertical, currentData);
         }
     });
 }
