@@ -15,6 +15,8 @@ public class GamePlayer {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     private Date enterDate;
+    private GameStatus status;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="player_id")
@@ -86,6 +88,17 @@ public class GamePlayer {
         salvos.add(salvo);
     }
 
+    public enum GameStatus{
+        WaitingForShips,
+        WaitingForSalvoes,
+        WaitingForEnemy
+    }
 
+    public GameStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(GameStatus status) {
+        this.status = status;
+    }
 }

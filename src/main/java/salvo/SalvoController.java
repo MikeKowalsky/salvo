@@ -265,6 +265,8 @@ public class SalvoController {
         gameWithUserMap.put("ships", MakeShipSetDTO(gp.getShips()));
         gameWithUserMap.put("salvoes", MakeSalvoSetDTO(gp.getSalvos(), GetEnemyGamePlayer(gp).getSalvos()));
         gameWithUserMap.put("hAS", MakeHitsAndSinksSet(gp));
+        gameWithUserMap.put("gameStatus", MakeGameStatusDTO(gp));
+
 
         if (!isGuest(authentication)){
             Player loggedInPlayer = playerRepo.findByUserName(authentication.getName());
@@ -313,28 +315,6 @@ public class SalvoController {
         return (gamePlayerRepo.findOne(gamePlayerId).getShips().size() > 0);
     }
 
-    private Long whichTurnIsIt(GamePlayer gamePlayer){
-        Comparator<Long> comparator = Comparator.comparing(Long::intValue);
-
-        Long turnNo = new Long(1);
-
-        if (gamePlayer.getSalvos().size() > 0){
-            turnNo = (gamePlayer
-                    .getSalvos()
-                    .stream()
-                    .map(salvo -> salvo.getTurnNumber())
-                    .max(comparator)
-                    .get() + 1
-            );
-        }
-        return turnNo;
-    }
-
-    private boolean isTurnCorrect(Salvo salvo, Long turnNo){
-        Long turnNoInReceivedData = salvo.getTurnNumber();
-        return turnNoInReceivedData.equals(turnNo);
-    }
-
     @RequestMapping(path = "/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createPlayer(String name, String pwd) {
 //        if (username.isEmpty()) {
@@ -360,6 +340,7 @@ public class SalvoController {
             Game newGame = gameRepo.save(new Game());
             Player currentPlayer = playerRepo.findByUserName(authentication.getName());
             GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, newGame));
+            newGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForShips);
 
             return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
         }
@@ -454,9 +435,71 @@ public class SalvoController {
         return new ResponseEntity<>(makeMap("Added Salvo", result), HttpStatus.CREATED);
     }
 
+    private Long whichTurnIsIt(GamePlayer gamePlayer){
+        Comparator<Long> comparator = Comparator.comparing(Long::intValue);
+
+        Long turnNo = new Long(1);
+
+        if (gamePlayer.getSalvos().size() > 0){
+            turnNo = (gamePlayer
+                    .getSalvos()
+                    .stream()
+                    .map(salvo -> salvo.getTurnNumber())
+                    .max(comparator)
+                    .get() + 1
+            );
+        }
+        return turnNo;
+    }
+
+    private boolean isTurnCorrect(Salvo salvo, Long turnNo){
+        Long turnNoInReceivedData = salvo.getTurnNumber();
+        return turnNoInReceivedData.equals(turnNo);
+    }
+
+
     private Map<String, Object> makeMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
         map.put(key, value);
         return map;
     }
+
+    //end of the game
+    private Map<String, Object> MakeGameStatusDTO(GamePlayer gp){
+
+        Map<String, Object> gameStatusDTO = new LinkedHashMap<String, Object>();
+        gameStatusDTO.put("status", gp.getStatus());
+        gameStatusDTO.put("isGameOver", isGameOver(gp));
+        if(isGameOver(gp)){
+            gameStatusDTO.put("whoWon", whoWon(gp));
+        }
+        return gameStatusDTO;
+    }
+
+    // end of the game
+    private boolean isGameOver(GamePlayer gp){
+        return ((noPlayersSinkedShips(gp) == 5) || noPlayersSinkedShips(GetEnemyGamePlayer(gp)) == 5);
+    }
+
+    // end of the game
+    private long whoWon(GamePlayer gp){
+        if (noPlayersSinkedShips(gp) < noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
+            return gp.getPlayer().getId();
+        } else if (noPlayersSinkedShips(gp) > noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
+            return GetEnemyGamePlayer(gp).getPlayer().getId();
+        } else {
+            return -1;
+        }
+    }
+
+    // end of the game
+    private long noPlayersSinkedShips(GamePlayer gp){
+        return gp.getShips().stream()
+                .filter(ship -> ship.isSink())
+                .count();
+    }
+
+
+
+
 }

@@ -17,6 +17,7 @@ public class Game{
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     private Date creationDate;
+    private boolean over;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     Set<GamePlayer> gamePlayerSet;
@@ -69,6 +70,14 @@ public class Game{
 
     public boolean isFull() {
         return this.getGamePlayerSet().size() == 2;
+    }
+
+    public void setOver(boolean over) {
+        this.over = over;
+    }
+
+    public boolean isOver() {
+        return over;
     }
 }
 
