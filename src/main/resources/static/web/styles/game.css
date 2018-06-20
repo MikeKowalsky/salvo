@@ -62,19 +62,24 @@ table {
 }
 
 .playersSalvo {
-    background-color: blue;
+    background-color: lightblue;
     font-weight: bold;
 }
 
-.enemysSalvo {
+.salvo {
     background-color: cornflowerblue;
     font-weight: bold;
 }
 
-.enemysSalvoHit {
+.salvoHit {
     background-color: red;
     font-weight: bold;
 }
+
+.sinkedShip{
+    background-color: darkgrey;
+}
+
 
 #doubleClickInfo{
     font-style: italic;
@@ -89,60 +94,60 @@ table {
 }
 
 /* SHIPS */
-#aircraftCarrierMark {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+/*#aircraftCarrierMark {*/
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*border: 1px solid black;*/
 
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
 
-    background-color: aquamarine;
-}
+    /*background-color: aquamarine;*/
+/*}*/
 
-#battleshipMark {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+/*#battleshipMark {*/
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*border: 1px solid black;*/
 
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
 
-    background-color: aquamarine;
-}
+    /*background-color: aquamarine;*/
+/*}*/
 
-#submarineMark {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+/*#submarineMark {*/
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*border: 1px solid black;*/
 
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
 
-    background-color: aquamarine;
-}
+    /*background-color: aquamarine;*/
+/*}*/
 
-#destroyerMark {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+/*#destroyerMark {*/
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*border: 1px solid black;*/
 
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
 
-    background-color: aquamarine;
-}
+    /*background-color: aquamarine;*/
+/*}*/
 
-#patrolBoatMark {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+/*#patrolBoatMark {*/
+    /*width: 40px;*/
+    /*height: 40px;*/
+    /*border: 1px solid black;*/
 
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
 
-    background-color: aquamarine;
-}
+    /*background-color: aquamarine;*/
+/*}*/
 
 /* PLACING & SAVING SHIPS */
 

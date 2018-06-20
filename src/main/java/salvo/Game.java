@@ -69,7 +69,7 @@ public class Game{
     }
 
     public boolean isFull() {
-        return this.getGamePlayerSet().size() == 2;
+        return this.getGamePlayerSet().size() > 1;
     }
 
     public void setOver(boolean over) {

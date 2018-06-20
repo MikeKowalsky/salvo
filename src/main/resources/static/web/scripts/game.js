@@ -73,12 +73,12 @@ function printGamePage(data, gpId){
 
     // save turnNo in salvoGrid element
     saveTurnNoInGrid(data, gpId);
-    console.log("tunrNo: " + $('#s0').data('turnNo'));
+    console.log("tunrNo: " + $('#0').data('turnNo'));
 
-    let shipsLocationArray = markShips(data);
-    markSalvos(data, playerId, 'owner', shipsLocationArray);
-    markSalvos(data, enemyId, 'enemy', shipsLocationArray);
-
+    // add gameStatus
+    printGameStatus(data);
+    markShips(data);
+    markSalvos(data, playerId);
 }
 
 window.GetQueryString = function(q) {
@@ -170,7 +170,7 @@ function showButtonAndHandleSendingSalvoesData(salvoesArray){
         // e.preventDefault();
         // e.stopPropagation();
 
-        let turnNo = $('#s0').data('turnNo');
+        let turnNo = $('#0').data('turnNo');
         console.log({turnNumber: turnNo, locations: salvoesArray});
         let dataToSend = {turnNumber: turnNo, locations: salvoesArray};
         console.log(JSON.stringify(dataToSend));
@@ -236,45 +236,55 @@ function markGrids(dataFromAjaxCall, gamePlayerId) {
 }
 
 function markShips(data) {
-
-    let shipsLocations = [];
     data.ships.forEach((ship) => {
         ship.locations.forEach((location) => {
             $('#' + location).addClass('playersShip')
                 .append(giveShipTypeShortcut(ship.shipType));
-            shipsLocations.push(location);
+            // shipsLocations.push(location);
         });
     });
-
-    // console.log('shipsLocations: ' + shipsLocations);
-    return shipsLocations;
 }
 
-function markSalvos(data, pID, playerType, shipsLocations) {
+// mark Salvoes for both players, also Hits and Sinks
+function markSalvos(data, pID) {
 
     let salvoLocations = {};
     data.salvoes.forEach((salvo) => salvoLocations[salvo.turnNo] = []);
     data.salvoes.forEach((salvo) => {
         if (pID === salvo.playerId){
+            salvo.locations.forEach((location) => salvoLocations[salvo.turnNo].push(`s${location}`));
+        } else {
             salvo.locations.forEach((location) => salvoLocations[salvo.turnNo].push(location));
         }
     });
-    console.log("salvos: " + playerType + " / " + JSON.stringify(salvoLocations));
+    console.log(`salvos: ${JSON.stringify(salvoLocations)}`);
 
     for (let key in salvoLocations){
-        salvoLocations[key].forEach((location) => {
-            if (playerType === 'owner'){
-                $('#s' + location).addClass('playersSalvo').append(key);
-            } else {
-                if (shipsLocations.includes(location)){
-                    console.log('hit: ' + location);
-                    $('#' + location).addClass('enemysSalvoHit').append(key);
-                } else {
-                    $('#' + location).addClass('enemysSalvo').append(key);
-                }
-            }
-        });
+            salvoLocations[key].forEach((location) => {
+                $(`#${location}`).addClass('salvo').append(key);
+            })
     }
+
+    data.hAS.forEach((turn) => {
+        markHits(turn, turn.hitsOnPlayer, 'player');
+        markHits(turn, turn.hitsOnEnemy, 'enemy');
+    })
+}
+
+function markHits(turn, hitsObject, playerType) {
+
+    for(shipType in hitsObject){
+        if(hitsObject[shipType].hits.length > 0){
+            hitsObject[shipType].hits.forEach((location) => {
+                if(playerType === 'player') {
+                    $(`#${location}`).addClass('salvoHit');
+                } else {
+                    $(`#s${location}`).addClass('salvoHit');
+                }
+            })
+        }
+    }
+
 }
 
 function hidePlacingShipsDivs(){
@@ -287,7 +297,7 @@ function hidePlacingShipsDivs(){
 function saveTurnNoInGrid(data, gpID) {
 
     let turnNo = 1;
-    let turnNoArray = [];
+    let turnNoArray = [0];
     let playerID = getPlayerId(data, gpID);
 
     if (data.salvoes.length > 0){
@@ -300,7 +310,9 @@ function saveTurnNoInGrid(data, gpID) {
         turnNo = (turnNoArray[0] + 1);
     }
 
-    $('#s0').data('turnNo', turnNo);
+    $('#0').data('turnNo', turnNo);
 }
 
-
+function printGameStatus(data) {
+    $('#gameStatus').append(`Current game status: ${data.gameStatus.status} `);
+}

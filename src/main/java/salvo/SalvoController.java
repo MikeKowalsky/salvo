@@ -88,9 +88,9 @@ public class SalvoController {
     }
 
     @RequestMapping("/games")
-    public Map<String, Object> test(Authentication authentication){
+    public Map<String, Object> test(Authentication authentication) {
         Map<String, Object> newGameDTO = new LinkedHashMap<String, Object>();
-        if (isGuest(authentication)){
+        if (isGuest(authentication)) {
             newGameDTO.put("player", null);
         } else {
             newGameDTO.put("player", MakePlayerDTO(loggedInPlayer(authentication)));
@@ -252,7 +252,7 @@ public class SalvoController {
          return hitsAndSinksSet;
     }
 
-    //main method to create JSON with all date for gameViewPage
+    //main method to create JSON with all data for gameViewPage
     @RequestMapping("/game_view/{gamePlayerId}")
     public Map<String, Object> singleGameView (Authentication authentication, @PathVariable Long gamePlayerId) throws UserIsNotAuthorized, NoLoggedInUser{
 
@@ -336,15 +336,15 @@ public class SalvoController {
 
         if (isGuest(authentication)){
             return new ResponseEntity<>(makeMap("error", "You need to be logged in"), HttpStatus.UNAUTHORIZED);
-        } else {
-            Game newGame = gameRepo.save(new Game());
-            Player currentPlayer = playerRepo.findByUserName(authentication.getName());
-            GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, newGame));
-            newGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForShips);
-
-            return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
         }
 
+        Game newGame = gameRepo.save(new Game());
+        Player currentPlayer = playerRepo.findByUserName(authentication.getName());
+        GamePlayer newGamePlayer = new GamePlayer(currentPlayer, newGame);
+        newGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForShips);
+        gamePlayerRepo.save(newGamePlayer);
+
+        return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
     }
 
 
@@ -365,7 +365,10 @@ public class SalvoController {
         }
 
         Player currentPlayer = playerRepo.findByUserName(authentication.getName());
-        GamePlayer newGamePlayer = gamePlayerRepo.save(new GamePlayer(currentPlayer, currentGame));
+        GamePlayer newGamePlayer = new GamePlayer(currentPlayer, currentGame);
+        newGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForShips);
+        gamePlayerRepo.save(newGamePlayer);
+
         return new ResponseEntity<>(makeMap("GamePlayerID", newGamePlayer.getId()), HttpStatus.CREATED);
     }
 
@@ -391,6 +394,7 @@ public class SalvoController {
         }
 
         GamePlayer currentGamePlayer = gamePlayerRepo.findOne(gamePlayerId);
+        Game currentGame = currentGamePlayer.getGame();
         Map<Object,Object> result = new HashMap<>();
 
         shipArray.forEach(ship -> {
@@ -399,10 +403,17 @@ public class SalvoController {
             result.put(ship.getId(), ship.getLocations());
         });
 
+        if (!currentGame.isFull() || GetEnemyGamePlayer(currentGamePlayer).getStatus() == GamePlayer.GameStatus.WaitingForShips){
+            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForEnemy);
+        } else {
+            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+            whenNeededChangeEnemysStatus(currentGamePlayer);
+        }
+        gamePlayerRepo.save(currentGamePlayer);
         return new ResponseEntity<>(makeMap("Added Ships", result), HttpStatus.CREATED);
     }
 
-
+    // add salvoes
     @RequestMapping(path = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addSalvos(Authentication authentication,
                                                         @PathVariable Long gamePlayerId,
@@ -420,9 +431,9 @@ public class SalvoController {
         }
 
         GamePlayer currentGamePlayer = gamePlayerRepo.findOne(gamePlayerId);
-        Long turnNo = whichTurnIsIt(currentGamePlayer);
+        Long currentTurnNo = whichTurnIsIt(currentGamePlayer);
 
-        if (!isTurnCorrect(newSalvo, turnNo)){
+        if (!isTurnCorrect(newSalvo, currentTurnNo)){
             return new ResponseEntity<>(makeMap("error", "Salvos are already located in this turn"), HttpStatus.FORBIDDEN);
         }
 
@@ -432,9 +443,29 @@ public class SalvoController {
         salvoRepo.save(newSalvo);
         result.put(newSalvo.getId(), newSalvo.getLocations());
 
+        if(newSalvo.getTurnNumber() == whichTurnIsIt(GetEnemyGamePlayer(currentGamePlayer))){
+            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForEnemy);
+        } else {
+            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+            whenNeededChangeEnemysStatus(currentGamePlayer);
+        }
+        gamePlayerRepo.save(currentGamePlayer);
+
         return new ResponseEntity<>(makeMap("Added Salvo", result), HttpStatus.CREATED);
     }
 
+    // method for addShips and addSalvoes to change enemy's game status
+    public void whenNeededChangeEnemysStatus(GamePlayer currentGamePlayer){
+        GamePlayer enemyGamePlayer = GetEnemyGamePlayer(currentGamePlayer);
+        Game currentGame = currentGamePlayer.getGame();
+
+        if(currentGame.isFull() && enemyGamePlayer.getStatus() == GamePlayer.GameStatus.WaitingForEnemy){
+            enemyGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+            gamePlayerRepo.save(enemyGamePlayer);
+        }
+    }
+
+    // add salvoes
     private Long whichTurnIsIt(GamePlayer gamePlayer){
         Comparator<Long> comparator = Comparator.comparing(Long::intValue);
 
@@ -452,12 +483,13 @@ public class SalvoController {
         return turnNo;
     }
 
-    private boolean isTurnCorrect(Salvo salvo, Long turnNo){
+    // add salvoes
+    private boolean isTurnCorrect(Salvo salvo, Long currentTurnNo){
         Long turnNoInReceivedData = salvo.getTurnNumber();
-        return turnNoInReceivedData.equals(turnNo);
+        return turnNoInReceivedData.equals(currentTurnNo);
     }
 
-
+    // creating Map objects for responses
     private Map<String, Object> makeMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
         map.put(key, value);

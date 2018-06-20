@@ -2,26 +2,28 @@
 function createGameStateTable(data) {
 
     let hASArray = data.hAS;
-    hASArray.sort((turn1, turn2) => turn1.turnNo - turn2.turnNo);
+    if (hASArray != null){
+        hASArray.sort((turn1, turn2) => turn1.turnNo - turn2.turnNo);
 
-    hASArray.forEach((turn) => {
-        let addTurnNoCell = 0
-        for (key in turn.hitsOnPlayer){
+        hASArray.forEach((turn) => {
+            let addTurnNoCell = 0
+            for (key in turn.hitsOnPlayer){
 
-            let tdId = turn.turnNo + "_" + key.charAt(0);
-            let currentKey = key;
+                let tdId = turn.turnNo + "_" + key.charAt(0);
+                let currentKey = key;
 
-            $('#gameState table tbody').append("<tr id='" + tdId + "'></tr>");
+                $('#gameState table tbody').append("<tr id='" + tdId + "'></tr>");
 
-            if (addTurnNoCell === 0){
-                $('#' + tdId).append("<td rowspan='" + Object.keys(turn.hitsOnPlayer).length + "'>" + turn.turnNo + "</td>");
+                if (addTurnNoCell === 0){
+                    $('#' + tdId).append("<td rowspan='" + Object.keys(turn.hitsOnPlayer).length + "'>" + turn.turnNo + "</td>");
+                }
+                addTurnNoCell++;
+
+                addRowsForGivenPlayer(turn.hitsOnPlayer, currentKey,tdId);
+                addRowsForGivenPlayer(turn.hitsOnEnemy, currentKey, tdId);
             }
-            addTurnNoCell++;
-
-            addRowsForGivenPlayer(turn.hitsOnPlayer, currentKey,tdId);
-            addRowsForGivenPlayer(turn.hitsOnEnemy, currentKey, tdId);
-        }
-    });
+        });
+    }
 }
 
 function addRowsForGivenPlayer(hitsObject, passedKey, id) {
