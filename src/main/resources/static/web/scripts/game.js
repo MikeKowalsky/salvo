@@ -265,10 +265,12 @@ function markSalvos(data, pID) {
             })
     }
 
-    data.hAS.forEach((turn) => {
-        markHits(turn, turn.hitsOnPlayer, 'player');
-        markHits(turn, turn.hitsOnEnemy, 'enemy');
-    })
+    if(data.hAS != null){
+        data.hAS.forEach((turn) => {
+            markHits(turn, turn.hitsOnPlayer, 'player');
+            markHits(turn, turn.hitsOnEnemy, 'enemy');
+        })
+    }
 }
 
 function markHits(turn, hitsObject, playerType) {

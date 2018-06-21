@@ -33,6 +33,9 @@ public class SalvoController {
     @Autowired
     SalvoRepository salvoRepo;
 
+    @Autowired
+    SalvoTempRepository salvoTempRepo;
+
     private Map<String, Object> MakePlayerDTO(Player player){
         Map<String, Object> playerDTO = new LinkedHashMap<String, Object>();
         playerDTO.put("id", player.getId());
@@ -438,17 +441,49 @@ public class SalvoController {
         }
 
         Map<Object,Object> result = new HashMap<>();
+        GamePlayer enemysGamePlayer = GetEnemyGamePlayer(currentGamePlayer);
 
         currentGamePlayer.addSalvo(newSalvo);
-        salvoRepo.save(newSalvo);
-        result.put(newSalvo.getId(), newSalvo.getLocations());
 
-        if(newSalvo.getTurnNumber() == whichTurnIsIt(GetEnemyGamePlayer(currentGamePlayer))){
-            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForEnemy);
-        } else {
+        if(enemysGamePlayer.getSalvosTemp().size() > 0){
+
+            // save players salvo
+            currentGamePlayer.addSalvo(newSalvo);
+            salvoRepo.save(newSalvo);
+            result.put(newSalvo.getId(), newSalvo.getLocations());
+
+
+            // create and save enemys salvo
+            SalvoTemp enemysSalvoTemp = getEnemySalvoTemp(enemysGamePlayer);
+
+            List<String> tempLocations = new ArrayList<String>(enemysSalvoTemp.getLocations());
+            Salvo enemysSalvo = new Salvo(enemysSalvoTemp.getTurnNumber(), tempLocations);
+            enemysGamePlayer.addSalvo(enemysSalvo);
+            salvoRepo.save(enemysSalvo);
+            result.put(enemysSalvo.getId(), enemysSalvo.getLocations());
+
+            //change player status
             currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+
+            // change enemys status
             whenNeededChangeEnemysStatus(currentGamePlayer);
+
+            // delete used SalvoTemp from repo
+            salvoTempRepo.delete(getEnemySalvoTemp(enemysGamePlayer).getId());
+
+        } else {
+
+            // there is not salvo from enemy, so player's salvo to temp
+            List<String> tempLocations = new ArrayList<String>(newSalvo.getLocations());
+            SalvoTemp newSalvoTemp = new SalvoTemp(newSalvo.getTurnNumber(), tempLocations);
+            currentGamePlayer.addSalvoTemp(newSalvoTemp);
+            salvoTempRepo.save(newSalvoTemp);
+
+            // change status
+            currentGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForEnemy);
         }
+
+        // save currentGamePlayer
         gamePlayerRepo.save(currentGamePlayer);
 
         return new ResponseEntity<>(makeMap("Added Salvo", result), HttpStatus.CREATED);
@@ -463,6 +498,16 @@ public class SalvoController {
             enemyGamePlayer.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
             gamePlayerRepo.save(enemyGamePlayer);
         }
+    }
+
+    // return enemySalvoTemp
+    private SalvoTemp getEnemySalvoTemp(GamePlayer enemysGamePlayer){
+        Optional<SalvoTemp> optional = enemysGamePlayer
+                .getSalvosTemp()
+                .stream()
+//                    .filter(salvoTemp -> salvoTemp.getTurnNumber() == currentTurnNo)
+                .findFirst();
+        return optional.get();
     }
 
     // add salvoes
