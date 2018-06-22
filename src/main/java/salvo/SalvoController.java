@@ -36,6 +36,9 @@ public class SalvoController {
     @Autowired
     SalvoTempRepository salvoTempRepo;
 
+    @Autowired
+    ScoreRepository scoreRepo;
+
     private Map<String, Object> MakePlayerDTO(Player player){
         Map<String, Object> playerDTO = new LinkedHashMap<String, Object>();
         playerDTO.put("id", player.getId());
@@ -106,20 +109,28 @@ public class SalvoController {
         return playerRepo.findByUserName(authentication.getName());
     }
 
-    private Double CountSum (Player player){
-        return player.getScoreSet()
+    //
+    // special request to get date to build leaderboard
+    //
+    @RequestMapping("/leaderboard")
+    public List<Object> Leaderboard(){
+        return playerRepo
+                .findAll()
                 .stream()
-                .mapToDouble(oS -> oS.getScore())
-                .sum();
+                .map(onePlayer -> MakeLbDTO(onePlayer))
+                .collect(Collectors.toList());
     }
 
-    private Long CountCertainResults(Double result, Player player){
-        return player.getScoreSet()
-                .stream()
-                .filter(oneScore -> oneScore.getScore().equals(result))
-                .count();
+    // building leaderboard - object for one player
+    private Map<String, Object> MakeLbDTO(Player player){
+        Map<String, Object> lbDTO = new LinkedHashMap<String, Object>();
+        lbDTO.put("playerId", player.getId());
+        lbDTO.put("userName", player.getUserName());
+        lbDTO.put("results", CountDifferentResultsDTO(player));
+        return lbDTO;
     }
 
+    // building leaderboard - obejct for different game results for that particular player
     private Map<String, Object> CountDifferentResultsDTO(Player player){
         Map<String, Object> countWinsDTO = new LinkedHashMap<String, Object>();
         countWinsDTO.put("won", CountCertainResults(1.0, player));
@@ -129,22 +140,22 @@ public class SalvoController {
         return countWinsDTO;
     }
 
-    private Map<String, Object> MakeLbDTO(Player player){
-        Map<String, Object> lbDTO = new LinkedHashMap<String, Object>();
-        lbDTO.put("playerId", player.getId());
-        lbDTO.put("userName", player.getUserName());
-        lbDTO.put("results", CountDifferentResultsDTO(player));
-        return lbDTO;
+    // building leaderboard - counting that type of results
+    private Long CountCertainResults(Double result, Player player){
+        return player.getScoreSet()
+                .stream()
+                .filter(oneScore -> oneScore.getScore().equals(result))
+                .count();
     }
 
-    @RequestMapping("/leaderboard")
-    public List<Object> Leaderboard(){
-        return playerRepo
-                .findAll()
+    // building leaderboard - when have all different results counting total sum
+    private Double CountSum (Player player){
+        return player.getScoreSet()
                 .stream()
-                .map(onePlayer -> MakeLbDTO(onePlayer))
-                .collect(Collectors.toList());
+                .mapToDouble(oS -> oS.getScore())
+                .sum();
     }
+
 
     // ship data for gameViewPage
     private Map<String, Object> MakeShipDTO (Ship ship){
@@ -162,6 +173,7 @@ public class SalvoController {
                 .collect(Collectors.toSet());
     }
 
+    //
     public GamePlayer GetEnemyGamePlayer (GamePlayer gamePlayerOwner){
         Optional<GamePlayer> enemy = gamePlayerOwner.getGame().getGamePlayerSet()
                 .stream()
@@ -211,6 +223,7 @@ public class SalvoController {
         Map<String, Object> currentShipInfo = new LinkedHashMap<String, Object>();
         currentShipInfo.put("size", currentShipLocations.size());
         currentShipInfo.put("hits", hits);
+        currentShipInfo.put("hitsTillNow", currentShip.getHits().size());
         currentShipInfo.put("isSink", currentShip.isSink());
         return currentShipInfo;
     }
@@ -452,7 +465,6 @@ public class SalvoController {
             salvoRepo.save(newSalvo);
             result.put(newSalvo.getId(), newSalvo.getLocations());
 
-
             // create and save enemys salvo
             SalvoTemp enemysSalvoTemp = getEnemySalvoTemp(enemysGamePlayer);
 
@@ -561,6 +573,10 @@ public class SalvoController {
     // end of the game
     private long whoWon(GamePlayer gp){
         if (noPlayersSinkedShips(gp) < noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
+            Score newWinScore = new Score(gp.getPlayer(), gp.getGame(), 1.0);
+            scoreRepo.save(newWinScore);
+            Score newLoseScore = new Score(GetEnemyGamePlayer(gp).getPlayer(), gp.getGame(), 0.0);
+            scoreRepo.save(newLoseScore);
             return gp.getPlayer().getId();
         } else if (noPlayersSinkedShips(gp) > noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
             return GetEnemyGamePlayer(gp).getPlayer().getId();

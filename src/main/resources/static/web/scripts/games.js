@@ -126,7 +126,7 @@ function printUserNameAndShowButtons(player) {
 }
 
 function printMainGameList (games) {
-    console.log(games);
+    // console.log(games);
     let loggedInUserId;
 
     (isAnyUserLoggedIn(games.player)) ? loggedInUserId = games.player.id : loggedInUserId = null;
@@ -134,14 +134,11 @@ function printMainGameList (games) {
 
     games.games.forEach((game) => {
         let creationDate = new Date(game.created);
-        let playerTwo;
-        let scoresResult;
-        let scores;
+        let playerTwo, scoresResult, scores;
         let gamePlayerForLoggidInUser = setGamePlayerIdForLoggedInUser(loggedInUserId, game);
 
-        (game.gamePlayers.length < 2) ?
-            playerTwo = "N/A" :
-            playerTwo = game.gamePlayers[1].player.email;
+        (game.gamePlayers.length < 2) ? playerTwo = "N/A" :
+                                        playerTwo = game.gamePlayers[1].player.email;
 
         if (game.scores != undefined) {
             let scoreP0 = game.scores[0].score;
@@ -165,13 +162,20 @@ function printMainGameList (games) {
         }
 
         // rendering game list with link to game, if logged in player is in this game
-        if (game.gamePlayers[0].player.id == loggedInUserId ||
-            (playerTwo != "N/A" && game.gamePlayers[1].player.id == loggedInUserId)) {
-            $("#gameList").append("<li><a href='/web/game.html?gp=" + gamePlayerForLoggidInUser + "'>\
-                ID: " + game.id + ", Created: " + creationDate + ",</a><br>\
-			Player One: " + game.gamePlayers[0].player.email + ",<br>\
-			Player Two: " + playerTwo + "<br>" +
-                scores + "<br><br></li>");
+        if (game.gamePlayers[0].player.id === loggedInUserId ||
+            (playerTwo !== "N/A" && game.gamePlayers[1].player.id === loggedInUserId)) {
+            if(game.scores !== undefined){
+                $("#gameList").append(`<li>ID: ${ game.id }, Created: ${ creationDate }<br>
+			                               Player One: ${ game.gamePlayers[0].player.email },<br>
+			                               Player Two: ${ playerTwo } <br>
+                                           ${ scores }<br><br></li>`);
+            } else {
+                $("#gameList").append(`<li><a href='/web/game.html?gp=${ gamePlayerForLoggidInUser }'>
+                                           ID: ${ game.id }, Created: ${ creationDate },</a><br>
+			                               Player One: ${ game.gamePlayers[0].player.email },<br>
+			                               Player Two: ${ playerTwo }<br>
+                                           ${ scores }<br><br></li>`);
+            }
         } else {
             $("#gameList").append("<li>ID: " + game.id + ", Created: " + creationDate + ",<br>\
 			Player One: " + game.gamePlayers[0].player.email + ",<br>\

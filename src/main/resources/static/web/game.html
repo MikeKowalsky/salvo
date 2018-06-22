@@ -13,42 +13,65 @@
 
     <div id="errorDiv">
         <div id="errorMsg"></div>
-        <a href="/web/games.html">Go back to game list</a>
     </div>
 
-    <form id="logout-form" onsubmit=logout()>
-        <button>Log out</button>
-    </form>
+    <div id="gameLogOut">
+        <div>
+            <a href="/web/games.html">Back to game list</a>
+        </div>
 
-    <div>
-        <a href="/web/games.html">Back to game list</a>
+        <form id="logout-form" onsubmit=logout()>
+            <button>Log out</button>
+        </form>
     </div>
 
-    <div id="gameNo"></div>
+    <div id="gameNo">
+        <table>
+            <tr>
+                <td colspan="2" id="tableGameID"></td>
+                <td colspan="5" id="tableCreated"></td>
+            </tr>
+            <tr id="tablePlayers">
+            </tr>
+            <tr id="tableLastTurnRow">
+            </tr>
+            <tr id="tableLastTurnSecondRow">
+            </tr>
+            <tr id="row-aircraftCarrier">
+            </tr>
+            <tr id="row-battleship">
+            </tr>
+            <tr id="row-submarine">
+            </tr>
+            <tr id="row-destroyer">
+            </tr>
+            <tr id="row-patrolBoat">
+            </tr>
+            <tr id="gameStatusRow"></tr>
+        </table>
+    </div>
 
-    <div id="tempSalvoButto ">
+    <div id="tempSalvoButton">
         <input id="activateSalvoePlacing" type="button" value="Activate Salvo Placing">
     </div>
 
-    <br>
-    <div id="gameState">
-        <table>
-            <tr>
-                <th rowspan="2">Turn No.</th>
-                <th colspan="2">Hits on player</th>
-                <th colspan="2">Hits on enemy</th>
-            </tr>
-            <tr>
-                <th>Ship Type</th>
-                <th>Hits</th>
-                <th>Ship Type</th>
-                <th>Hits</th>
-            </tr>
-        </table>
-    </div>
-    <br>
-
-    <div id="gameStatus"></div>
+    <!--<br>-->
+    <!--<div id="gameState">-->
+        <!--<table>-->
+            <!--<tr>-->
+                <!--<th rowspan="2">Turn No.</th>-->
+                <!--<th colspan="2">Hits on player</th>-->
+                <!--<th colspan="2">Hits on enemy</th>-->
+            <!--</tr>-->
+            <!--<tr>-->
+                <!--<th>Ship Type</th>-->
+                <!--<th>Hits</th>-->
+                <!--<th>Ship Type</th>-->
+                <!--<th>Hits</th>-->
+            <!--</tr>-->
+        <!--</table>-->
+    <!--</div>-->
+    <!--<br>-->
 
     <div id="shipChoose">
         <br><br>
@@ -110,6 +133,7 @@
         crossorigin="anonymous">
 </script>
 <script src="/web/scripts/gameGameStateTable.js"></script>
+<script src="/web/scripts/gameHeaderTable.js"></script>
 <script src="/web/scripts/game.js"></script>
 <script src="/web/scripts/gamePlacingShips.js"></script>
 <script src="/web/scripts/gamePlacingSalvoes.js"></script>

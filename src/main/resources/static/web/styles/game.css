@@ -1,4 +1,13 @@
 
+#gameLogOut{
+    display: flex;
+    /*justify-content: space-between;*/
+}
+
+#gameLogOut > form{
+    margin-left: 30px;
+}
+
 #twoGrids {
     display: flex;
 }
@@ -183,12 +192,21 @@ table {
     background-color: red;
 }
 
-#gameState > table > tbody > tr > th{
-    border: 1px solid black;
-    padding: 3px;
+/*#gameState > table > tbody > tr > th{*/
+    /*border: 1px solid black;*/
+    /*padding: 3px;*/
+/*}*/
+
+/*#gameState > table > tbody > tr > td{*/
+    /*border: 1px solid black;*/
+    /*padding: 3px;*/
+/*}*/
+
+#gameNo > table {
+    margin: 10px;
 }
 
-#gameState > table > tbody > tr > td{
+#gameNo > table > tbody > tr > td {
     border: 1px solid black;
     padding: 3px;
 }

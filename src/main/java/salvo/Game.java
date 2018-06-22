@@ -17,7 +17,7 @@ public class Game{
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
     private Date creationDate;
-    private boolean over;
+//    private boolean over;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     Set<GamePlayer> gamePlayerSet;
@@ -53,7 +53,7 @@ public class Game{
     }
 
     public boolean hasScore () {
-        return (!getScoreSet().isEmpty()) ? true : false;
+        return (!getScoreSet().isEmpty());
     }
 
     public List<Player> getPlayers(){
@@ -72,12 +72,12 @@ public class Game{
         return this.getGamePlayerSet().size() > 1;
     }
 
-    public void setOver(boolean over) {
-        this.over = over;
-    }
-
-    public boolean isOver() {
-        return over;
-    }
+//    public void setOver(boolean over) {
+//        this.over = over;
+//    }
+//
+//    public boolean isOver() {
+//        return over;
+//    }
 }
 

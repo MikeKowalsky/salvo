@@ -101,37 +101,39 @@ public class SalvoApplication {
 			gamePlayerRepo.save(gp13);
 			gamePlayerRepo.save(gp14);
 
-			Ship s01 = new Ship("Destroyer");
+			Ship s01 = new Ship("destroyer");
 			s01.setLocations(new ArrayList<String>(Arrays.asList("H2", "H3", "H4")));
 			gp1.addShip(s01);
-			Ship s02 = new Ship("Submarine");
-			s02.setLocations(new ArrayList<String>(Arrays.asList("E1", "F1", "G1")));
+			Ship s02 = new Ship("submarine");
+			s02.setLocations(new ArrayList<String>(Arrays.asList("E2", "F2", "G2")));
 			gp1.addShip(s02);
-			Ship s03 = new Ship("Patrol Boat");
+			Ship s03 = new Ship("patrolBoat");
 			s03.setLocations(new ArrayList<String>(Arrays.asList("B4", "B5")));
 			gp1.addShip(s03);
-			Ship s04 = new Ship("Destroyer");
-			s04.setLocations(new ArrayList<String>(Arrays.asList("B5", "C5", "D5")));
-			gp2.addShip(s04);
-			Ship s05 = new Ship("Patrol Boat");
-			s05.setLocations(new ArrayList<String>(Arrays.asList("F1", "F2")));
-			gp2.addShip(s05);
-			Ship s06 = new Ship("Destroyer");
-			s06.setLocations(new ArrayList<String>(Arrays.asList("B5", "C5", "D5")));
-			gp3.addShip(s06);
-			Ship s07 = new Ship("Patrol Boat");
-			s07.setLocations(new ArrayList<String>(Arrays.asList("C6", "C7")));
-			gp3.addShip(s07);
-			Ship s08 = new Ship("Submarine");
-			s08.setLocations(new ArrayList<String>(Arrays.asList("A2", "A4", "A5")));
-			gp4.addShip(s08);
-			Ship s09 = new Ship("Patrol Boat");
-			s09.setLocations(new ArrayList<String>(Arrays.asList("G6", "H6")));
-			gp4.addShip(s09);
+			Ship s04 = new Ship("aircraftCarrier");
+			s04.setLocations(new ArrayList<String>(Arrays.asList("A1", "B1", "C1", "D1", "E1")));
+			gp1.addShip(s04);
+			Ship s05 = new Ship("battleship");
+			s05.setLocations(new ArrayList<String>(Arrays.asList("D5", "E5", "F5", "G5")));
+			gp1.addShip(s05);
 
-			Ship s10 = new Ship("Destroyer");
-			s10.setLocations(new ArrayList<String>(Arrays.asList("B5", "C5", "D5")));
-			gp5.addShip(s10);
+
+			Ship s06 = new Ship("destroyer");
+			s06.setLocations(new ArrayList<String>(Arrays.asList("B5", "C5", "D5")));
+			gp2.addShip(s06);
+			Ship s07 = new Ship("patrolBoat");
+			s07.setLocations(new ArrayList<String>(Arrays.asList("C6", "C7")));
+			gp2.addShip(s07);
+			Ship s08 = new Ship("submarine");
+			s08.setLocations(new ArrayList<String>(Arrays.asList("A3", "A4", "A5")));
+			gp2.addShip(s08);
+			Ship s09 = new Ship("battleship");
+			s09.setLocations(new ArrayList<String>(Arrays.asList("E6", "F6" ,"G6", "H6")));
+			gp2.addShip(s09);
+			Ship s10 = new Ship("aircraftCarrier");
+			s10.setLocations(new ArrayList<String>(Arrays.asList("A10", "B10", "C10", "D10", "E10")));
+			gp2.addShip(s10);
+
 			Ship s11 = new Ship("Patrol Boat");
 			s11.setLocations(new ArrayList<String>(Arrays.asList("C6", "C7")));
 			gp5.addShip(s11);
@@ -234,30 +236,30 @@ public class SalvoApplication {
 			shipRepo.save(s31);
 
 			Salvo slv01 = new Salvo(1);
-			slv01.setLocations(new ArrayList<String>(Arrays.asList("B5", "C5", "F1")));
+			slv01.setLocations(new ArrayList<String>(Arrays.asList("E6", "F6", "G6", "H6", "A2")));
 			gp1.addSalvo(slv01);
-			Salvo slv02 = new Salvo(1);
-			slv02.setLocations(new ArrayList<String>(Arrays.asList("B4", "B5", "B6")));
-			gp2.addSalvo(slv02);
-			Salvo slv03 = new Salvo(2);
-			slv03.setLocations(new ArrayList<String>(Arrays.asList("F2", "D5")));
+			Salvo slv02 = new Salvo(2);
+			slv02.setLocations(new ArrayList<String>(Arrays.asList("A3", "A4", "A5", "B7", "B8")));
+			gp1.addSalvo(slv02);
+			Salvo slv03 = new Salvo(3);
+			slv03.setLocations(new ArrayList<String>(Arrays.asList("B5", "D5", "C5", "A9", "A8")));
 			gp1.addSalvo(slv03);
-			Salvo slv04 = new Salvo(2);
-			slv04.setLocations(new ArrayList<String>(Arrays.asList("E1", "H3", "A2")));
-			gp2.addSalvo(slv04);
+			Salvo slv04 = new Salvo(4);
+			slv04.setLocations(new ArrayList<String>(Arrays.asList("C6", "C7", "A1", "C1", "C2")));
+			gp1.addSalvo(slv04);
 
 			Salvo slv05 = new Salvo(1);
-			slv05.setLocations(new ArrayList<String>(Arrays.asList("A2", "A4", "G6")));
-			gp4.addSalvo(slv05);
-			Salvo slv06 = new Salvo(1);
-			slv06.setLocations(new ArrayList<String>(Arrays.asList("B5", "D5", "C7")));
-			gp3.addSalvo(slv06);
-			Salvo slv07 = new Salvo(2);
-			slv07.setLocations(new ArrayList<String>(Arrays.asList("A3", "H6")));
-			gp4.addSalvo(slv07);
-			Salvo slv08 = new Salvo(2);
-			slv08.setLocations(new ArrayList<String>(Arrays.asList("C5", "C6")));
-			gp3.addSalvo(slv08);
+			slv05.setLocations(new ArrayList<String>(Arrays.asList("D5", "E5", "F5", "G5", "H5")));
+			gp2.addSalvo(slv05);
+			Salvo slv06 = new Salvo(2);
+			slv06.setLocations(new ArrayList<String>(Arrays.asList("D2", "E2", "F2", "G2", "H8")));
+			gp2.addSalvo(slv06);
+			Salvo slv07 = new Salvo(3);
+			slv07.setLocations(new ArrayList<String>(Arrays.asList("H2", "H3", "H4", "A2", "A3")));
+			gp2.addSalvo(slv07);
+			Salvo slv08 = new Salvo(4);
+			slv08.setLocations(new ArrayList<String>(Arrays.asList("B4", "B5", "C10", "D10", "E10")));
+			gp2.addSalvo(slv08);
 
 			Salvo slv09 = new Salvo(1);
 			slv09.setLocations(new ArrayList<String>(Arrays.asList("G6", "H6", "A4")));
@@ -323,8 +325,8 @@ public class SalvoApplication {
 			salvoRepo.save(slv20);
 			salvoRepo.save(slv21);
 
-			Score sc01 = new Score(p1, g1, 1.0);
-			Score sc02 = new Score(p2, g1, 0.0);
+//			Score sc01 = new Score(p1, g1, 1.0);
+//			Score sc02 = new Score(p2, g1, 0.0);
 			Score sc03 = new Score(p1, g2, 0.5);
 			Score sc04 = new Score(p2, g2, 0.5);
 			Score sc05 = new Score(p2, g3, 1.0);
@@ -332,8 +334,8 @@ public class SalvoApplication {
 			Score sc07 = new Score(p2, g4, 0.5);
 			Score sc08 = new Score(p1, g4, 0.5);
 
-			scoreRepo.save(sc01);
-			scoreRepo.save(sc02);
+//			scoreRepo.save(sc01);
+//			scoreRepo.save(sc02);
 			scoreRepo.save(sc03);
 			scoreRepo.save(sc04);
 			scoreRepo.save(sc05);
@@ -341,6 +343,10 @@ public class SalvoApplication {
 			scoreRepo.save(sc07);
 			scoreRepo.save(sc08);
 
+			gp1.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+			gp2.setStatus(GamePlayer.GameStatus.WaitingForSalvoes);
+			gamePlayerRepo.save(gp1);
+			gamePlayerRepo.save(gp2);
 		};
 	}
 }

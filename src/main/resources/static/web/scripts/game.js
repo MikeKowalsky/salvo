@@ -51,11 +51,11 @@ function handleError(code) {
 function printGamePage(data, gpId){
 
     let playerId = getPlayerId(data,gpId);
-    let enemyId = getEnemyId(data,gpId);
+    // let enemyId = getEnemyId(data,gpId);
 
     header(data, gpId);
 
-    createGameStateTable(data);
+    // createGameStateTable(data);
 
     if(data.ships.length > 0){
         hidePlacingShipsDivs();
@@ -75,8 +75,6 @@ function printGamePage(data, gpId){
     saveTurnNoInGrid(data, gpId);
     console.log("tunrNo: " + $('#0').data('turnNo'));
 
-    // add gameStatus
-    printGameStatus(data);
     markShips(data);
     markSalvos(data, playerId);
 }
@@ -109,26 +107,6 @@ function getEnemyId(data, gpId) {
         return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[1].player.id : data.gamePlayers[0].player.id;
     } else {
         return null;
-    }
-
-}
-
-function header(dataFromAjaxCall, gamePlayerId) {
-
-    $('#gameNo').append('<h2>Game id: '+ dataFromAjaxCall.gameId + ' , Created:  '
-        + new Date(dataFromAjaxCall.created) + '</h2>');
-    $('#gameNo').append('<p id="p1">Player One: ' + dataFromAjaxCall.gamePlayers[0].player.email + '</p>');
-    if (enemyExist(dataFromAjaxCall)){
-        $('#gameNo').append('<p id="p2">Player Two: ' + dataFromAjaxCall.gamePlayers[1].player.email + '</p>');
-    } else {
-        $('#gameNo').append('<p id="p2">Player Two: N/A</p>');
-    }
-
-
-    if (gamePlayerId == dataFromAjaxCall.gamePlayers[0].id){
-        $('#p1').append('<span>(you)</span>').addClass('bold');
-    } else {
-        $('#p2').append('<span>(you)</span>').addClass('bold');
     }
 
 }
@@ -313,8 +291,4 @@ function saveTurnNoInGrid(data, gpID) {
     }
 
     $('#0').data('turnNo', turnNo);
-}
-
-function printGameStatus(data) {
-    $('#gameStatus').append(`Current game status: ${data.gameStatus.status} `);
 }
