@@ -578,7 +578,9 @@ public class SalvoController {
         return map;
     }
 
-    //end of the game
+    //
+    // Game status
+    //
     private Map<String, Object> MakeGameStatusDTO(GamePlayer gp){
 
         Map<String, Object> gameStatusDTO = new LinkedHashMap<String, Object>();
@@ -599,34 +601,47 @@ public class SalvoController {
         return gameStatusDTO;
     }
 
-    // end of the game
+    // game status && end of the game
     private boolean isGameOver(GamePlayer gp){
         return ((noPlayersSinkedShips(gp) == 5) || noPlayersSinkedShips(GetEnemyGamePlayer(gp)) == 5);
     }
 
-    // end of the game
+    // game status && end of the game
     private long whoWon(GamePlayer gp){
         if (noPlayersSinkedShips(gp) < noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
-            Score newWinScore = new Score(gp.getPlayer(), gp.getGame(), 1.0);
-            scoreRepo.save(newWinScore);
-            Score newLoseScore = new Score(GetEnemyGamePlayer(gp).getPlayer(), gp.getGame(), 0.0);
-            scoreRepo.save(newLoseScore);
+            changeScores(gp, "smbWon");
             return gp.getPlayer().getId();
         } else if (noPlayersSinkedShips(gp) > noPlayersSinkedShips(GetEnemyGamePlayer(gp))){
+            changeScores(GetEnemyGamePlayer(gp), "smbWon");
             return GetEnemyGamePlayer(gp).getPlayer().getId();
         } else {
+            changeScores(gp, "tie");
             return -1;
         }
     }
 
-    // end of the game
+    // game status && end of the game
     private long noPlayersSinkedShips(GamePlayer gp){
         return gp.getShips().stream()
                 .filter(ship -> ship.isSink())
                 .count();
     }
 
+    // game status && end of the game
+    private void changeScores(GamePlayer gp, String tie){
+        if(!gp.getGame().hasScore()){
+            if(tie == "tie"){
+                Score newScore1 = new Score(gp.getPlayer(), gp.getGame(), 0.5);
+                Score newScore2 = new Score(GetEnemyGamePlayer(gp).getPlayer(), gp.getGame(), 0.5);
+                scoreRepo.save(newScore1);
+                scoreRepo.save(newScore2);
+            } else {
+                Score newScore1 = new Score(gp.getPlayer(), gp.getGame(), 1.0);
+                Score newScore2 = new Score(GetEnemyGamePlayer(gp).getPlayer(), gp.getGame(), 0.0);
+                scoreRepo.save(newScore1);
+                scoreRepo.save(newScore2);
+            }
 
-
-
+        }
+    }
 }

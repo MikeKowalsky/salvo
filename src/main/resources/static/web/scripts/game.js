@@ -15,7 +15,6 @@ $(document).ready(function(){
                     console.log( "unauthorized" );
                     hideAllBecauseErrorAndShowErrorDiv();
                     handleError(401);
-
                 },
                 403: function() {
                     console.log( "log in first" );
