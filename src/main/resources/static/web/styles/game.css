@@ -102,62 +102,6 @@ table {
     text-decoration: line-through;
 }
 
-/* SHIPS */
-/*#aircraftCarrierMark {*/
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*border: 1px solid black;*/
-
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-
-    /*background-color: aquamarine;*/
-/*}*/
-
-/*#battleshipMark {*/
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*border: 1px solid black;*/
-
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-
-    /*background-color: aquamarine;*/
-/*}*/
-
-/*#submarineMark {*/
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*border: 1px solid black;*/
-
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-
-    /*background-color: aquamarine;*/
-/*}*/
-
-/*#destroyerMark {*/
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*border: 1px solid black;*/
-
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-
-    /*background-color: aquamarine;*/
-/*}*/
-
-/*#patrolBoatMark {*/
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*border: 1px solid black;*/
-
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-
-    /*background-color: aquamarine;*/
-/*}*/
-
 /* PLACING & SAVING SHIPS */
 
 .placingShip {
@@ -218,4 +162,13 @@ table {
 .sinked{
     text-decoration: line-through;
     background-color: darkgrey;
+}
+
+#salvoButton{
+    display: flex;
+    justify-content: center;
+}
+
+#salvoButton > input{
+    margin: 10px;
 }

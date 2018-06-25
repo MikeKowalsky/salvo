@@ -2,7 +2,9 @@ package salvo;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Ship {
@@ -18,7 +20,7 @@ public class Ship {
 
     @ElementCollection
     @Column(name="hit")
-    private List<String> hits = new ArrayList<>();
+    private Set<String> hits = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")
@@ -59,7 +61,7 @@ public class Ship {
         return shipType;
     }
 
-    public List<String> getHits() {
+    public Set<String> getHits() {
         return hits;
     }
 

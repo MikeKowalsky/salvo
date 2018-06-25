@@ -204,7 +204,7 @@ function setGamePlayerIdForLoggedInUser(loggedInPlayerID, oneGame){
 function createNewGame() {
     $.post("/api/games")
         .done(function(resp) {
-            console.log("new game created!");
+            // console.log("new game created!");
             console.log(resp);
             window.location = makeUrlForNewGameOrJoin(resp);
 

@@ -102,8 +102,10 @@ public class GamePlayer {
 
     public enum GameStatus{
         WaitingForShips,
+        WaitingForSecondPlayer,
         WaitingForSalvoes,
-        WaitingForEnemy
+        WaitingForEnemy,
+        GameOver
     }
 
     public GameStatus getStatus() {

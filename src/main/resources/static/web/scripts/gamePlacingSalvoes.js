@@ -1,13 +1,5 @@
 
-$(document).ready(function(){
-
-    activateSalvoPlacing();
-    $('#saveLocationDiv').hide();
-
-});
-
-
-function activateSalvoPlacing(){
+function activateSalvosPlacingButton(){
 
     $('#activateSalvoePlacing').on('click', function(){
         handleOnMouseOverSalvoes();

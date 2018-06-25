@@ -3,6 +3,8 @@ $(document).ready(function(){
 
     $('#errorDiv').hide();
     $('#savePositionsDiv').hide();
+    $('#salvoButton').hide();
+    $('#saveLocationDiv').hide();
 
     let gamePlayerId = GetQueryString();
     console.log(gamePlayerId);
@@ -61,12 +63,23 @@ function printGamePage(data, gpId){
         hidePlacingShipsDivs();
     }
 
+    if(data.gameStatus.status === "WaitingForSalvoes"){
+        $('#salvoButton').show();
+        activateSalvosPlacingButton();
+    }
+
+
     printGrid('#grid');
-    if (enemyExist(data)){
+    if (enemyExist(data)) {
         printGrid('#salvoGrid');
-    } else {
+    }
+
+    if (data.gameStatus.status === "WaitingForSecondPlayer" || (data.gameStatus.status === "WaitingForShips")){
         $('#playerTwo').hide();
     }
+    // } else {
+    //     $('#playerTwo').hide();
+    // }
     markGrids(data, gpId);
 
     activateSendShipLocationsButton();
@@ -77,6 +90,8 @@ function printGamePage(data, gpId){
 
     markShips(data);
     markSalvos(data, playerId);
+
+    timeOut(data, gpId);
 }
 
 window.GetQueryString = function(q) {
@@ -291,4 +306,10 @@ function saveTurnNoInGrid(data, gpID) {
     }
 
     $('#0').data('turnNo', turnNo);
+}
+
+function timeOut(data, gpId) {
+    if(data.gameStatus.status === "WaitingForSecondPlayer" || data.gameStatus.status === 'WaitingForEnemy'){
+        setTimeout(function() { window.location = "/web/game.html?gp=" + gpId; }, 10000);
+    }
 }

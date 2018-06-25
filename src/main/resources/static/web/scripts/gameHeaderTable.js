@@ -50,13 +50,6 @@ function lastTurnRow(data, enemyMail) {
 
         addRowsForGivenPlayer(lastTurn.hitsOnPlayer);
         addRowsForGivenPlayer(lastTurn.hitsOnEnemy);
-    // } else {
-    //     $('#tableLastTurnRow').hide();
-    //     $('#row-aircraftCarrier').hide();
-    //     $('#row-battleship').hide();
-    //     $('#row-submarine').hide();
-    //     $('#row-destroyer').hide();
-    //     $('#row-patrolBoat').hide();
     }
 }
 
@@ -86,30 +79,39 @@ function addGameStatus(data) {
 
     let  msg = "Something weird is happening!";
 
-    if(data.gameStatus.status == null){
-        msg = 'Waiting for second player.';
-    } else if (data.gameStatus.status === "WaitingForShips"){
-        msg = 'Please place your ships on the grid!';
-    } else if (data.gameStatus.status === 'WaitingForEnemy' && data.salvoes.length > 0){
-        msg = "Waiting for enemy's salvo.";
-    } else if (data.gameStatus.isGameOver){
+
+    if(data.gameStatus.isGameOver){
         if(data.gameStatus.whoWon === -1){
             msg = "Tie! Both players finished the game in the same turn.";
         } else {
-            let winnerGamePlayerId = data.gameStatus.whoWon;
+            let winnerPlayerId = data.gameStatus.whoWon;
             let winnerEmail;
-            if (data.gamePlayers[0].id === winnerGamePlayerId){
+            if (data.gamePlayers[0].player.id === winnerPlayerId){
                 winnerEmail = data.gamePlayers[0].player.email;
             } else {
                 winnerEmail = data.gamePlayers[1].player.email;
             }
 
-            msg = `Game over! Congratulations, ${ winnerEmail } wins!`
+            if(data.loggedInName === winnerEmail){
+                msg = `Game over! Congratulations, you won!`
+            } else {
+                msg = `Game over! You lost the game, player ${ winnerEmail } won.`;
+            }
         }
-
-    } else if (data.gameStatus.status === "WaitingForSalvoes"){
-        msg = "Please place your salvo.";
+    } else {
+        if(data.gameStatus.status == null) {
+            msg = 'Waiting for second player.';
+        } else if (data.gameStatus.status === "WaitingForSecondPlayer") {
+            msg = 'Please wait for second player.'
+        } else if (data.gameStatus.status === "WaitingForShips"){
+            msg = 'Please place your ships on the grid!';
+        } else if (data.gameStatus.status === 'WaitingForEnemy'){
+            msg = "Waiting for enemy's salvo.";
+        } else if (data.gameStatus.status === "WaitingForSalvoes"){
+            msg = "Please place your salvo.";
+        }
     }
+
 
     $('#gameStatusRow').append(`<td colspan="2">Game status: </td>
                                 <td colspan="5">${ msg }</td>`);
