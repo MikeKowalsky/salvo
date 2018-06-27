@@ -378,8 +378,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-//					.antMatchers("/admin/**").hasAuthority("ADMIN")
-//					.antMatchers("/game").authenticated()
 					.antMatchers("/**").permitAll()
 					.and()
 				.formLogin()

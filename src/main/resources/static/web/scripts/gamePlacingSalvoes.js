@@ -3,6 +3,7 @@ function activateSalvosPlacingButton(){
 
     $('#activateSalvoePlacing').on('click', function(){
         handleOnMouseOverSalvoes();
+        $('#activateSalvoePlacing').prop('disabled', true);
     })
 }
 
@@ -30,6 +31,12 @@ function handleOnMouseOverSalvoes() {
                 // storing salvoes, counting them, activating onclick mouse e
                 let thisTurnSalvosArray = currentTurnSalvoesArray();
                 if (thisTurnSalvosArray.length < 5){
+
+                    //empty array, hide button, switch off event listener
+                    $('#locationArray').empty();
+                    $('#saveLocationDiv').hide();
+                    $('#saveLocationButton').off('click');
+
                     handleOnClickSalvoes(IDs);
                 } else if (thisTurnSalvosArray.length === 5){
                     // console.log(thisTurnSalvosArray);

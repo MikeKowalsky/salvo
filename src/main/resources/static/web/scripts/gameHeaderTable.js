@@ -79,7 +79,6 @@ function addGameStatus(data) {
 
     let  msg = "Something weird is happening!";
 
-
     if(data.gameStatus.isGameOver){
         if(data.gameStatus.whoWon === -1){
             msg = "Tie! Both players finished the game in the same turn.";
@@ -104,7 +103,7 @@ function addGameStatus(data) {
         } else if (data.gameStatus.status === "WaitingForSecondPlayer") {
             msg = 'Please wait for second player.'
         } else if (data.gameStatus.status === "WaitingForShips"){
-            msg = 'Please place your ships on the grid!';
+            msg = 'Please place your ships on the grid and save them!';
         } else if (data.gameStatus.status === 'WaitingForEnemy'){
             msg = "Waiting for enemy's salvo.";
         } else if (data.gameStatus.status === "WaitingForSalvoes"){

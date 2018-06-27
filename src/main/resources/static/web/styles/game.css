@@ -90,7 +90,7 @@ table {
 }
 
 
-#doubleClickInfo{
+.italic{
     font-style: italic;
 }
 
@@ -164,11 +164,53 @@ table {
     background-color: darkgrey;
 }
 
-#salvoButton{
+#twoSalvoButtons{
     display: flex;
-    justify-content: center;
+    align-items: center;
+
 }
 
-#salvoButton > input{
+/*#twoSalvoButtons *{*/
+    /*margin: 10px;*/
+/*}*/
+
+#saveLocationDiv{
+    font-size: 30px;
+}
+
+#salvoButton{
+    font-size: 30px;
+}
+
+.redInput{
+    background-color: lightcoral;
+
+    border: 1px solid red;
+    border-radius: 5px;
+    min-height: 50px;
+
+    font-weight: bold;
+
     margin: 10px;
 }
+
+.rightSide{
+    padding: 50px 0 0 20px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#shipChoose *{
+    margin-bottom: 10px;
+}
+
+#orientationChoose *{
+    margin-bottom: 10px;
+}
+
+#errorDiv{
+    margin: 10px;
+}
+
+

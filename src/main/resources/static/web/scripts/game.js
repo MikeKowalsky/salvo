@@ -37,6 +37,7 @@ function hideAllBecauseErrorAndShowErrorDiv() {
     $('#logout-form').hide();
     $('#gameNo').hide();
     $('#twoGrids').hide();
+    $('#doubleClickInfo').hide();
     $('#errorDiv').show();
 }
 
@@ -76,9 +77,7 @@ function printGamePage(data, gpId){
     if (data.gameStatus.status === "WaitingForSecondPlayer" || (data.gameStatus.status === "WaitingForShips")){
         $('#playerTwo').hide();
     }
-    // } else {
-    //     $('#playerTwo').hide();
-    // }
+
     markGrids(data, gpId);
 
     activateSendShipLocationsButton();
@@ -112,18 +111,17 @@ function getPlayerId(data, gpId) {
 }
 
 function enemyExist(data) {
-    // console.log((data.gamePlayers.length == 2) ? true : false);
     return (data.gamePlayers.length > 1);
 }
 
-function getEnemyId(data, gpId) {
-    if (enemyExist(data)) {
-        return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[1].player.id : data.gamePlayers[0].player.id;
-    } else {
-        return null;
-    }
-
-}
+// function getEnemyId(data, gpId) {
+//     if (enemyExist(data)) {
+//         return (gpId == data.gamePlayers[0].id) ? data.gamePlayers[1].player.id : data.gamePlayers[0].player.id;
+//     } else {
+//         return null;
+//     }
+//
+// }
 
 function activateSendShipLocationsButton(){
     $('#savePositions').on("click", function (e){
@@ -253,7 +251,7 @@ function markSalvos(data, pID) {
 
     for (let key in salvoLocations){
             salvoLocations[key].forEach((location) => {
-                $(`#${location}`).addClass('salvo').append(key);
+                $(`#${location}`).addClass('salvo').append(` ${ key}`);
             })
     }
 
@@ -278,7 +276,6 @@ function markHits(turn, hitsObject, playerType) {
             })
         }
     }
-
 }
 
 function hidePlacingShipsDivs(){

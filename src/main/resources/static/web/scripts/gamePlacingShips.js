@@ -1,12 +1,12 @@
 
 function isShipRadioButtonClicked() {
-    let vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const vertical = ['','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     handleOnMouseOver(buildGridIdsArray(vertical, 'forShips'), vertical);
 }
 
 function whichShipIsOn() {
 
-    let shipButtonsIDs  = ['aircraftCarrier', 'battleship', 'submarine', 'destroyer', 'patrolBoat'];
+    const shipButtonsIDs  = ['aircraftCarrier', 'battleship', 'submarine', 'destroyer', 'patrolBoat'];
     for(let i=0; i<shipButtonsIDs.length; i++){
         if(document.getElementById(shipButtonsIDs[i]).checked){
             return shipButtonsIDs[i];
@@ -38,13 +38,13 @@ function handleOnMouseOver(IDs, vertical) {
 
     $('#grid').on("mouseover", function (e) {
 
-        $('#grid').off("click"); //sprawdzic czy mozna nie korzystac z tego jesli jest located ship
+        $('#grid').off("click");
         e.stopPropagation();
         removePastClasses();
 
         if (IDs.includes(e.target.id)) {
             // console.log(e.target.id);
-            currentData = showOrSaveShip(e.target.id, IDs, vertical, false);
+            currentData = showShipAndShadow(e.target.id, IDs, vertical);
             // console.log(currentData);
             handleOnClick(IDs, vertical, currentData);
         }
@@ -110,7 +110,7 @@ function handleDraggingEventListener(placedShips) {
     $('#grid').on("click", function (e) {
 
         e.stopPropagation();
-        let $idToDrag = $('#' + e.target.id);
+        const $idToDrag = $('#' + e.target.id);
 
         if ($idToDrag.hasClass('savedShip')){
             placedShips.forEach((placedShip) => {
@@ -133,17 +133,13 @@ function handleDraggingEventListener(placedShips) {
 }
 
 function makeSavedShipsObject() {
-    let savedShipsArray = [{shipType: "aircraftCarrier", locations: []},
+    const savedShipsArray = [{shipType: "aircraftCarrier", locations: []},
         {shipType: "battleship", locations: []},
         {shipType: "submarine", locations: []},
         {shipType: "destroyer", locations: []},
         {shipType: "patrolBoat", locations: []}];
 
-
-    // [ { type: "destroyer", locations: ["E1", "F1", "G1"] },
-    // { type: "patrol boat", locations: ["I5", "I6"] }])
-
-    let receivedDataArray = makeReceivedDataArray();
+    const receivedDataArray = makeReceivedDataArray();
 
     savedShipsArray.forEach((shipType) => {
         receivedDataArray.forEach(gridLocation => {
@@ -167,17 +163,17 @@ function makeReceivedDataArray(){
     return receivedDataArray;
 }
 
-function showOrSaveShip(pointer, gridIDs, vertical) {
+function showShipAndShadow(pointer, gridIDs, vertical) {
 
-    let currentShipType = whichShipIsOn();
-    let currentOrient = whatOrientation();
-    let pointerRow = pointer.charAt(0);
-    let pointerCol = makeColFromID(pointer);
+    const currentShipType = whichShipIsOn();
+    const currentOrient = whatOrientation();
+    const pointerRow = pointer.charAt(0);
+    const pointerCol = makeColFromID(pointer);
     // console.log("PointerRow: " + pointerRow + " / PointerCol: " + pointerCol + " / " + currentShipType + " / " + currentOrient);
 
-    let shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
+    const shipDO = {"aircraftCarrier": 5, "battleship": 4, "submarine": 3, "destroyer": 3, "patrolBoat": 2};
 
-    // Ship
+    // Show ship
     let currentShip = [];
     if (currentOrient === 'horizontal') {
         for(let i = pointerCol; i < (pointerCol + shipDO[currentShipType]); i++) {
@@ -185,8 +181,8 @@ function showOrSaveShip(pointer, gridIDs, vertical) {
                 currentShip.push(pointerRow + i);
             }
         }
-    } else {
-        let shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + shipDO[currentShipType]));
+    } else { // vertical
+        const shipRows = vertical.slice(vertical.indexOf(pointerRow), (vertical.indexOf(pointerRow) + shipDO[currentShipType]));
         for(let i = 0; i < shipRows.length; i++) {
             currentShip.push(shipRows[i] + pointerCol);
         }
@@ -197,17 +193,17 @@ function showOrSaveShip(pointer, gridIDs, vertical) {
             addNotAllowedClass(currentShip) : addPlacingShipClass(currentShip);
     });
 
-    // Shadow
+    // Show shadow
     let currentShadow = [];
     if (currentOrient === 'horizontal'){
-        let shipRowsHorizontal = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + 2));
+        const shipRowsHorizontal = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + 2));
         for(let i = (pointerCol - 1); i < (pointerCol + shipDO[currentShipType] + 1); i++){
             for(let j = 0; j < shipRowsHorizontal.length; j++){
                 currentShadow.push(shipRowsHorizontal[j] + i);
             }
         }
     } else {
-        let shipRows = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + shipDO[currentShipType] + 1));
+        const shipRows = vertical.slice(vertical.indexOf(pointerRow) - 1, (vertical.indexOf(pointerRow) + shipDO[currentShipType] + 1));
         for(let i = 0; i < shipRows.length; i++){
             for(let j = (pointerCol - 1); j < (pointerCol + 2); j++){
                 currentShadow.push(shipRows[i] + j);
@@ -226,7 +222,7 @@ function showOrSaveShip(pointer, gridIDs, vertical) {
         addNotAllowedShadowClass(currentShadow);
     }
 
-    let currentData = [currentShip, currentShipType];
+    const currentData = [currentShip, currentShipType];
     // console.log(currentData);
     return currentData;
 }
@@ -238,7 +234,7 @@ function makeColFromID(id){
 function addPlacingShipClass(currentShip) {
 
     currentShip.forEach(id => {
-        let $elementWithID =  $('#' + id);
+        const $elementWithID =  $('#' + id);
         if ($elementWithID.hasClass('savedShip')){
             return null;
         } else {
@@ -250,7 +246,7 @@ function addPlacingShipClass(currentShip) {
 function addNotAllowedClass(currentShip) {
 
     currentShip.forEach(id => {
-        let $elementWithID =  $('#' + id);
+        const $elementWithID =  $('#' + id);
         if ($elementWithID.hasClass('savedShip')){
             return null;
         } else {
@@ -260,7 +256,7 @@ function addNotAllowedClass(currentShip) {
 }
 
 function addPlacingShipShadowClass(id) {
-    let $elementWithID =  $('#' + id);
+    const $elementWithID =  $('#' + id);
     if ($elementWithID.hasClass('placingShip') ||
         $elementWithID.hasClass('notAllowed')){
         return null;
@@ -272,7 +268,7 @@ function addPlacingShipShadowClass(id) {
 function addNotAllowedShadowClass(currentShadow){
 
     currentShadow.forEach(id => {
-        let $elementWithID =  $('#' + id);
+        const $elementWithID =  $('#' + id);
         if ($elementWithID.hasClass('placingShip') ||
             $elementWithID.hasClass('notAllowed')){
             return null;
@@ -285,7 +281,7 @@ function addNotAllowedShadowClass(currentShadow){
 function addSaveClassAndCreateData(currentShip, shipType) {
 
     currentShip.forEach(id => {
-        let $elementWithID =  $('#' + id);
+        const $elementWithID =  $('#' + id);
         if($elementWithID.hasClass('notAllowed')){
             return null;
         }
@@ -299,7 +295,7 @@ function addSaveClassAndCreateData(currentShip, shipType) {
 }
 
 function removePastClasses(){
-    let $allGridElements = $('#grid *');
+    const $allGridElements = $('#grid *');
     $allGridElements.removeClass('placingShip');
     $allGridElements.removeClass('notAllowed');
     $allGridElements.removeClass('placingShipShadow');
@@ -308,7 +304,7 @@ function removePastClasses(){
 
 function isSavedAndShadow(currentShadow) {
     let counter = 0;
-    let alreadyTakenIDs = makeAlreadyTakenIDs();
+    const alreadyTakenIDs = makeAlreadyTakenIDs();
 
     alreadyTakenIDs.forEach(id => {
         if(currentShadow.includes(id)){

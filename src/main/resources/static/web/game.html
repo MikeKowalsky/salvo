@@ -68,40 +68,18 @@
     <!--</div>-->
     <!--<br>-->
 
-    <div id="shipChoose">
-        <br><br>
-        <input type="radio" name="shipType" id="aircraftCarrier" onclick="isShipRadioButtonClicked()">
-        <label for="aircraftCarrier">Aircraft Carrier - AC - (size: 5)</label><br>
-        <br>
-        <input type="radio" name="shipType" id="battleship" onclick="isShipRadioButtonClicked()">
-        <label for="battleship">Battleship - BS - (size: 4)</label><br>
-        <br>
-        <input type="radio" name="shipType" id="submarine" onclick="isShipRadioButtonClicked()">
-        <label for="submarine">Submarine - SM - (size: 3)</label><br>
-        <br>
-        <input type="radio" name="shipType" id="destroyer" onclick="isShipRadioButtonClicked()">
-        <label for="destroyer">Destroyer - DE - (size: 3)</label><br>
-        <br>
-        <input type="radio" name="shipType" id="patrolBoat" onclick="isShipRadioButtonClicked()">
-        <label for="patrolBoat">Patrol Boat - PB - (size: 2)</label><br>
-        <br>
-    </div>
-
-    <div id="orientationChoose">
-        <input type="radio" name="orientation" id="horizontal" checked>
-        <label for="horizontal">Horizontal</label><br>
-        <input type="radio" name="orientation" id="portrait">
-        <label for="portrait">Portrait</label><br>
-    </div>
-
-    <div id="doubleClickInfo"><br>* To drag placed ship use double click!</div>
-
-    <div id="salvoButton">
-        <input id="activateSalvoePlacing" type="button" value="Place SALVO">
+    <div id="twoSalvoButtons">
+        <div id="salvoButton">
+            <input id="activateSalvoePlacing" class="redInput" type="button" value="Place SALVO">
+        </div>
+        <div id="locationArray">
+        </div>
+        <div id="saveLocationDiv">
+            <input id="saveLocationButton" class="redInput" type="button" value="Fire!">
+        </div>
     </div>
 
     <div id="twoGrids">
-        <br>
         <div>
             <div id="gridOne"></div>
             <div id="grid"></div>
@@ -109,20 +87,51 @@
         <div id="playerTwo">
             <div id="gridTwo"></div>
             <div id="salvoGrid"></div>
-            <div id="locationArray">
-                <br>
+        </div>
+        <div>
+            <div id="shipChoose" class="rightSide">
+                <span class="italic">Choose ship type and locate it on the grid:</span>
+                <div>
+                    <input type="radio" name="shipType" id="aircraftCarrier" onclick="isShipRadioButtonClicked()">
+                    <label for="aircraftCarrier">Aircraft Carrier - AC - (size: 5)</label>
+                </div>
+                <div>
+                    <input type="radio" name="shipType" id="battleship" onclick="isShipRadioButtonClicked()">
+                    <label for="battleship">Battleship - BS - (size: 4)</label>
+                </div>
+                <div>
+                    <input type="radio" name="shipType" id="submarine" onclick="isShipRadioButtonClicked()">
+                    <label for="submarine">Submarine - SM - (size: 3)</label>
+                </div>
+                <div>
+                    <input type="radio" name="shipType" id="destroyer" onclick="isShipRadioButtonClicked()">
+                    <label for="destroyer">Destroyer - DE - (size: 3)</label>
+                </div>
+                <div>
+                    <input type="radio" name="shipType" id="patrolBoat" onclick="isShipRadioButtonClicked()">
+                    <label for="patrolBoat">Patrol Boat - PB - (size: 2)</label>
+                </div>
+                <div id="doubleClickInfo" class="italic">* To drag placed ship use double click!</div>
             </div>
-            <div id="saveLocationDiv">
-                <br>
-                <input id="saveLocationButton" type="button" value="Save salvoes locations">
+
+            <div id="orientationChoose" class="rightSide">
+                <span class="italic">Choose ship orientation:</span>
+                <div>
+                    <input type="radio" name="orientation" id="horizontal" checked>
+                    <label for="horizontal">Horizontal</label>
+                </div>
+                <div>
+                    <input type="radio" name="orientation" id="portrait">
+                    <label for="portrait">Portrait</label>
+                </div>
             </div>
+
+            <div id="savePositionsDiv">
+                <input id="savePositions" class="redInput" type="button" value="Save ships positions">
+            </div>
+
         </div>
 
-    </div>
-
-    <div id="savePositionsDiv">
-        <br>
-        <input id="savePositions" type="button" value="Save ships positions">
     </div>
 </div>
 
