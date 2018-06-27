@@ -41,7 +41,7 @@ function login(form) {
         })
         .fail(function(resp){
             console.log(resp);
-            alert('Something went wrong! Error code: ' + resp.status + ', text: ' + resp.responseJSON.error);
+            alert(`Something went wrong! Error code: ${ resp.status }, text: ${ resp.responseJSON.error }`);
         });
 }
 
@@ -89,13 +89,14 @@ function cleanLeaderboard() {
 function printLeaderboard (lb){
 	console.log(lb);
 
-    $("#leaderboard").append("<tr>\
-		<th class='bg'>Player ID</th>\
-		<th>Name</th>\
-		<th>Total Points</th>\
-		<th>Won</th>\
-		<th>Lost</th>\
-		<th>Tied</th></tr>tr>");
+    $("#leaderboard").append(`<tr>
+		                        <th class='bg'>Player ID</th>
+		                        <th>Name</th>
+		                        <th>Total Points</th>
+		                        <th>Won</th>
+		                        <th>Lost</th>
+		                        <th>Tied</th>
+		                      </tr>`);
 
     lb.sort((a, b) => b.results.sumOfPoints - a.results.sumOfPoints);
     lb.forEach((player) => {
@@ -104,13 +105,14 @@ function printLeaderboard (lb){
 
     lb.forEach((player) => {
     	if (player.noOfmatches > 0){
-            $("#leaderboard").append("<tr>\
-				<td class='bg'>" + player.playerId + "</td>\
-				<td>" + player.userName + "</td>\
-				<td class='bg'>" + player.results.sumOfPoints + "</td>\
-				<td>" + player.results.won + "</td>\
-				<td>" + player.results.lost + "</td>\
-				<td>" + player.results.tied + "</td></tr>tr>");
+            $("#leaderboard").append(`<tr>
+				                        <td class='bg'>${ player.playerId }</td>
+				                        <td>${ player.userName }</td>
+				                        <td class='bg'>${ player.results.sumOfPoints }</td>
+				                        <td>${ player.results.won }</td>
+				                        <td>${ player.results.lost }</td>
+				                        <td>${ player.results.tied }</td>
+				                      </tr>`);
 		}
 	});
 }
@@ -121,7 +123,7 @@ function cleanMainGameList(){
 
 function printUserNameAndShowButtons(player) {
     $('#login-form').hide();
-    $('#userName').append('<div>User name: ' + player.email + '</div>');
+    $('#userName').append(`<div>User name: ${ player.email }</div>`);
     $('#newGame').show();
 }
 
@@ -133,16 +135,20 @@ function printMainGameList (games) {
     console.log('logged in user ID: ' + loggedInUserId);
 
     games.games.forEach((game) => {
-        let creationDate = new Date(game.created);
+        const creationDate = new Date(game.created);
         let playerTwo, scoresResult, scores;
-        let gamePlayerForLoggidInUser = setGamePlayerIdForLoggedInUser(loggedInUserId, game);
+        const options = { weekday: 'short', year: 'numeric', month: 'long',
+            day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        const formattedDate = new Intl.DateTimeFormat('en-EN', options).format(creationDate);
+        const gamePlayerForLoggidInUser = setGamePlayerIdForLoggedInUser(loggedInUserId, game);
 
         (game.gamePlayers.length < 2) ? playerTwo = "N/A" :
                                         playerTwo = game.gamePlayers[1].player.email;
 
         if (game.scores != undefined) {
-            let scoreP0 = game.scores[0].score;
-            let scoreP1 = game.scores[1].score;
+            const scoreP0 = game.scores[0].score;
+            const scoreP1 = game.scores[1].score;
+
             if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[0].player.id) {
                 scoresResult = game.gamePlayers[0].player.email;
             } else if (scoreP0 > scoreP1 && game.scores[0].playerId == game.gamePlayers[1].player.id) {
@@ -165,27 +171,33 @@ function printMainGameList (games) {
         if (game.gamePlayers[0].player.id === loggedInUserId ||
             (playerTwo !== "N/A" && game.gamePlayers[1].player.id === loggedInUserId)) {
             if(game.scores !== undefined){
-                $("#gameList").append(`<li>ID: ${ game.id }, Created: ${ creationDate }<br>
-			                               Player One: ${ game.gamePlayers[0].player.email },<br>
-			                               Player Two: ${ playerTwo } <br>
-                                           ${ scores }<br><br></li>`);
+                $("#gameList").append(`<li>
+                                           <div>Game No: ${ game.id }, Created: ${ formattedDate }</div>
+			                               <div>Player One: ${ game.gamePlayers[0].player.email },</div>
+			                               <div>Player Two: ${ playerTwo },</div>
+                                           <div>${ scores }</div>
+                                       </li>`);
             } else {
-                $("#gameList").append(`<li><a href='/web/game.html?gp=${ gamePlayerForLoggidInUser }'>
-                                           ID: ${ game.id }, Created: ${ creationDate },</a><br>
-			                               Player One: ${ game.gamePlayers[0].player.email },<br>
-			                               Player Two: ${ playerTwo }<br>
-                                           ${ scores }<br><br></li>`);
+                $("#gameList").append(`<li>
+                                           <div><a href='/web/game.html?gp=${ gamePlayerForLoggidInUser }'>
+                                           Game No: ${ game.id }, Created: ${ formattedDate },</a></div>
+			                               <div>Player One: ${ game.gamePlayers[0].player.email },</div>
+			                               <div>Player Two: ${ playerTwo },</div>
+                                           <div>${ scores }</div>
+                                       </li>`);
             }
         } else {
-            $("#gameList").append("<li>ID: " + game.id + ", Created: " + creationDate + ",<br>\
-			Player One: " + game.gamePlayers[0].player.email + ",<br>\
-			Player Two: " + playerTwo + "<br>" +
-                scores + "<br><br></li>");
+            $("#gameList").append(`<li>
+                                       <div>Game No: ${ game.id }, Created: ${ formattedDate },</div>
+			                           <div>Player One: ${ game.gamePlayers[0].player.email },</div>
+			                           <div>Player Two: ${ playerTwo }</div>
+                                       <div>${ scores }</div>
+                                   </li>`);
         }
 
         if (showJoinButton(games.player, game, loggedInUserId)) {
-            $('#gameList').append("<button data-gameId=" + game.id + " onclick=joinGame(" + game.id + ")>" +
-                "Join game " + game.id + " with " + game.gamePlayers[0].player.email + "</button><br><br>");
+            $('#gameList').append(`<button data-gameId=${ game.id } onclick=joinGame(${ game.id })>
+                Join game ${ game.id } with ${ game.gamePlayers[0].player.email }</button>`);
         }
     });
 }

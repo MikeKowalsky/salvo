@@ -23,7 +23,6 @@
 
 #leaderboard  > tr > td{
     border: 1px solid black;
-
     text-align: center;
 }
 
@@ -36,4 +35,20 @@
     padding: 5px;
     margin-bottom: 10px;
     background-color: darkorange;
+}
+
+#gameList > li {
+    list-style-type: none;
+    max-width: 500px;
+
+    padding: 10px;
+    margin: 10px;
+
+    border: 1px solid #eee;
+    box-shadow: 5px 5px #ccc;
+    border-radius: 5px;
+}
+
+#gameList > button {
+    margin: 0 0 10px 10px;
 }

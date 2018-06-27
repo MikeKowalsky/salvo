@@ -2,8 +2,11 @@
 function header(data, gamePlayerId) {
 
     $('#tableGameID').append(`Game No: ${ data.gameId }`);
-    let date = new Date(data.created);
-    $('#tableCreated').append(`Created: ${ date }`);
+    const date = new Date(data.created);
+    const options = { weekday: 'short', year: 'numeric', month: 'long',
+                        day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    const formattedDate = new Intl.DateTimeFormat('en-EN', options).format(date);
+    $('#tableCreated').append(`Created: ${ formattedDate }`);
 
     let playerMail, enemyMail;
 
@@ -29,11 +32,11 @@ function header(data, gamePlayerId) {
 
 function lastTurnRow(data, enemyMail) {
 
-    let hASArray = data.hAS;
+    const hASArray = data.hAS;
     if (hASArray != null){
         hASArray.sort((turn1, turn2) => turn2.turnNo - turn1.turnNo);
 
-        let [lastTurn] = hASArray;
+        const [lastTurn] = hASArray;
 
         $('#tableLastTurnRow').append(`<td rowspan="2">Last turn no</td>
                                        <td  colspan="3">Hits on you</td>
@@ -57,19 +60,19 @@ function addRowsForGivenPlayer(hitsObject) {
 
     for(shipType in hitsObject){
         if(hitsObject[shipType].isSink){
-            $(`#row-${ shipType }`).append("<td class='sinked'>" + shipType + "</td>");
+            $(`#row-${ shipType }`).append(`<td class='sinked'>${ shipType }</td>`);
             $(`#row-${ shipType }`).append(
                 `<td class='hit'> ${ hitsObject[shipType].hitsTillNow } / ${ hitsObject[shipType].size }</td>`);
         } else {
-            $(`#row-${ shipType }`).append("<td>" + shipType + "</td>");
+            $(`#row-${ shipType }`).append(`<td>${ shipType }</td>`);
             $(`#row-${ shipType }`).append(
                 `<td> ${ hitsObject[shipType].hitsTillNow } / ${ hitsObject[shipType].size }</td>`);
         }
 
         if(hitsObject[shipType].hits.length > 0){
-            $(`#row-${ shipType }`).append("<td class='hit'>" + hitsObject[shipType].hits.length + "</td>");
+            $(`#row-${ shipType }`).append(`<td class='hit'>${ hitsObject[shipType].hits.length }</td>`);
         } else {
-            $(`#row-${ shipType }`).append("<td>" + hitsObject[shipType].hits.length + "</td>");
+            $(`#row-${ shipType }`).append(`<td>${ hitsObject[shipType].hits.length }</td>`);
         }
     }
 
@@ -83,7 +86,7 @@ function addGameStatus(data) {
         if(data.gameStatus.whoWon === -1){
             msg = "Tie! Both players finished the game in the same turn.";
         } else {
-            let winnerPlayerId = data.gameStatus.whoWon;
+            const winnerPlayerId = data.gameStatus.whoWon;
             let winnerEmail;
             if (data.gamePlayers[0].player.id === winnerPlayerId){
                 winnerEmail = data.gamePlayers[0].player.email;
